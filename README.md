@@ -13,11 +13,11 @@ kept as a read-only reference.
 | path | what it is |
 |---|---|
 | `quantum_sensing/` | the group's single-mode sensing package, vendored unmodified from `shruti-jm/quantum-sensing` (`python/quantum_sensing/`). Not edited here |
-| `backaction_qfi/` | the study layer, built *on top of* the package without editing it: `solver` (tight ODE tolerances injected from outside, `rp_channel`, `rp_qfi`), `probes` (coherent, squeezed, cat, Fock at a given cutoff), `convergence` (Fock-cutoff ladder, truncation alarm) |
+| `backaction_qfi/` | the study layer, built *on top of* the package without editing it: `solver` (tight ODE tolerances injected from outside, `rp_channel`, `rp_qfi`), `probes` (coherent, squeezed, cat, Fock at a given cutoff), `convergence` (Fock-cutoff ladder, truncation alarm), `gaussian` (covariance-matrix track: exact for Gaussian probes, SQL / variational / FD-squeezing curves, strain conversion) |
 | `pyproject.toml` | packaging for both, so `pip install -e .` installs them |
 | `environment.yml` | conda environment that reproduces this project's setup |
 | `requirements.txt` | the pip side of the same setup; installs the package above in editable mode |
-| `tests/` | smoke tests for the environment, and the Fock-cutoff convergence suite |
+| `tests/` | smoke tests for the environment, the Fock-cutoff convergence suite, and the Gaussian benchmark suite |
 
 ## Set up
 
@@ -56,3 +56,20 @@ res.value, res.cutoff, res.converged
 
 `tests/test_convergence.py` pins this down, including the regression case
 where 20 levels is more than 10 % off.
+
+## Gaussian track
+
+`backaction_qfi.gaussian` carries the same channel at the level of first and
+second moments. It is exact for Gaussian probes (vacuum, coherent, squeezed)
+and Gaussian noise (loss, including loss *during* the shear), and it is the
+reference the Fock-space track is checked against. It also holds the textbook
+free-mass curves (KLMTV): the standard quantum limit `(1+κ²)/(2κ)`, variational
+readout `1/(2κ)`, and frequency-dependent squeezing `e^{-2r}(1+κ²)/(2κ)`, all
+pinned down in `tests/test_gaussian.py`. Phase noise and dephasing are
+non-Gaussian and live only in the Fock track.
+
+```python
+import backaction_qfi.gaussian as g
+g.gaussian_qfi(g.squeezed_at_fixed_nbar(2.0), kappa_ba=1.0, eta_out=0.9)   # F for epsilon_a
+g.homodyne_noise_spectrum(kappa, r=1.0, squeeze_angle=g.fd_squeeze_angle(kappa))
+```
