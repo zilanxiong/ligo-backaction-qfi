@@ -18,6 +18,8 @@ kept as a read-only reference.
 | `environment.yml` | conda environment that reproduces this project's setup |
 | `requirements.txt` | the pip side of the same setup; installs the package above in editable mode |
 | `data/optimised_states/` | the group's previously optimised probes (no back-action), with the orientation note in its README |
+| `studies/` | the sweeps. `backaction_only.py`: QFI vs frequency and vs photon number with back-action only |
+| `results/`, `figures/` | outputs of the studies, one folder per study, with a `summary.md` each |
 | `tests/` | smoke tests for the environment, the Fock-cutoff convergence suite, the Gaussian benchmark suite, and the optimised-state loader |
 
 ## Set up
@@ -86,3 +88,22 @@ GW signal `epsilon_a` (see `data/optimised_states/README.md`).
 from backaction_qfi.optimised import load_probe
 psi, entry = load_probe("fock_sup", "loss_ch", eta=0.9, pn=0.0, N_target=5.0)
 ```
+
+## Studies
+
+### Back-action only (`studies/backaction_only.py`)
+
+No loss, no phase noise; ⟨n⟩ = 5; 25 frequencies from 10 Hz to 1 kHz with
+κ(Ω) from the package's LIGO defaults; eight probes (squeezed vacuum, coherent,
+even cat, squeezed cat, Fock, and the three optimised families). Every point is
+computed through the package's density-matrix channel with a convergence-checked
+cutoff and compared with the exact lossless value 8 Var(x).
+
+```bash
+python studies/backaction_only.py --n-max 400     # ~15 min; --quick for 7 frequencies
+python studies/backaction_only.py --figure-only   # re-render from saved CSVs
+```
+
+Result: with back-action alone the QFI is frequency independent for every probe
+(the shear generator x² commutes with the signal generator x). See
+`results/backaction_only/summary.md` and `figures/backaction_only.png`.

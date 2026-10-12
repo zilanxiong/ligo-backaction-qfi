@@ -131,3 +131,23 @@ def test_default_cutoff_is_not_trustworthy_under_backaction():
     # and the ladder is monotone: truncation over-estimates this QFI
     values = [v for _, v in res.history]
     assert all(a > c for a, c in zip(values, values[1:]))
+
+
+# --- probe families at fixed photon number -----------------------------------
+
+@pytest.mark.parametrize("family", ["coherent", "squeezed", "cat", "squeezed_cat", "fock"])
+def test_every_family_hits_the_photon_number(family):
+    psi = b.make_probe(family, 160, 5.0)
+    assert psi.norm() == pytest.approx(1.0)
+    assert b.mean_photon_number(psi) == pytest.approx(5.0, rel=1e-5)   # squeezed: truncation tail
+
+
+def test_squeezed_cat_interpolates_between_cat_and_squeezed_vacuum():
+    from backaction_qfi.probes import squeezed_cat
+    N = 160
+    assert b.var_x(squeezed_cat(N, 5.0, 0.0)) == pytest.approx(b.var_x(b.cat(N, 5.0)), rel=1e-6)
+    # Half the budget in squeezing: Var(x) lies between the cat's and the
+    # squeezed vacuum's (at nbar=5 it is already within 1e-3 of the latter, so
+    # the lossless sweep cannot separate the two).
+    vx_half = b.var_x(squeezed_cat(N, 5.0, 0.5))
+    assert b.var_x(b.cat(N, 5.0)) < vx_half <= b.var_x(b.squeezed(N, 5.0)) * 1.001
