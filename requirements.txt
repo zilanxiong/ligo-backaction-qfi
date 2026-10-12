@@ -1,5 +1,5 @@
-# Installs the group's quantum_sensing package (vendored in quantum-sensing-py/)
+# Installs the group's quantum_sensing package (quantum_sensing/ at the repo root)
 # together with its dependencies, plus what this project needs on top.
--e ./quantum-sensing-py
+-e .
 matplotlib>=3.7
 pytest>=7.0

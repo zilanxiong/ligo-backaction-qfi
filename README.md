@@ -12,7 +12,8 @@ kept as a read-only reference.
 
 | path | what it is |
 |---|---|
-| `quantum-sensing-py/` | the group's single-mode sensing package (`quantum_sensing`), vendored unmodified from `shruti-jm/quantum-sensing` (`python/`). Not edited here |
+| `quantum_sensing/` | the group's single-mode sensing package, vendored unmodified from `shruti-jm/quantum-sensing` (`python/quantum_sensing/`). Not edited here |
+| `pyproject.toml` | packaging for `quantum_sensing`, so `pip install -e .` installs it |
 | `environment.yml` | conda environment that reproduces this project's setup |
 | `requirements.txt` | the pip side of the same setup; installs the package above in editable mode |
 | `tests/` | smoke tests that the environment is set up correctly |
@@ -34,6 +35,6 @@ Without conda: create any Python 3.10+ virtual environment and run
 import quantum_sensing as qs
 ```
 
-`quantum-sensing-py/quantum_sensing/` is the upstream code as received. To
+`quantum_sensing/` is the upstream code as received. To
 update it, replace that folder with the newer `python/quantum_sensing/` from
 upstream; the editable install picks the change up without reinstalling.
