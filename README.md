@@ -13,11 +13,12 @@ kept as a read-only reference.
 | path | what it is |
 |---|---|
 | `quantum_sensing/` | the group's single-mode sensing package, vendored unmodified from `shruti-jm/quantum-sensing` (`python/quantum_sensing/`). Not edited here |
-| `backaction_qfi/` | the study layer, built *on top of* the package without editing it: `solver` (tight ODE tolerances injected from outside, `rp_channel`, `rp_qfi`), `probes` (coherent, squeezed, cat, Fock at a given cutoff), `convergence` (Fock-cutoff ladder, truncation alarm), `gaussian` (covariance-matrix track: exact for Gaussian probes, SQL / variational / FD-squeezing curves, strain conversion) |
+| `backaction_qfi/` | the study layer, built *on top of* the package without editing it: `solver` (tight ODE tolerances injected from outside, `rp_channel`, `rp_qfi`), `probes` (coherent, squeezed, cat, Fock at a given cutoff), `convergence` (Fock-cutoff ladder, truncation alarm), `gaussian` (covariance-matrix track: exact for Gaussian probes, SQL / variational / FD-squeezing curves, strain conversion), `optimised` (loads the group's optimised probes, rotated onto the GW signal) |
 | `pyproject.toml` | packaging for both, so `pip install -e .` installs them |
 | `environment.yml` | conda environment that reproduces this project's setup |
 | `requirements.txt` | the pip side of the same setup; installs the package above in editable mode |
-| `tests/` | smoke tests for the environment, the Fock-cutoff convergence suite, and the Gaussian benchmark suite |
+| `data/optimised_states/` | the group's previously optimised probes (no back-action), with the orientation note in its README |
+| `tests/` | smoke tests for the environment, the Fock-cutoff convergence suite, the Gaussian benchmark suite, and the optimised-state loader |
 
 ## Set up
 
@@ -72,4 +73,16 @@ non-Gaussian and live only in the Fock track.
 import backaction_qfi.gaussian as g
 g.gaussian_qfi(g.squeezed_at_fixed_nbar(2.0), kappa_ba=1.0, eta_out=0.9)   # F for epsilon_a
 g.homodyne_noise_spectrum(kappa, r=1.0, squeeze_angle=g.fd_squeeze_angle(kappa))
+```
+
+## Optimised probes
+
+`backaction_qfi.optimised.load_probe` reconstructs the group's optimised
+states from `data/optimised_states/`. They were optimised for the `epsilon_p`
+signal; the loader rotates them by a quarter turn so they are oriented for the
+GW signal `epsilon_a` (see `data/optimised_states/README.md`).
+
+```python
+from backaction_qfi.optimised import load_probe
+psi, entry = load_probe("fock_sup", "loss_ch", eta=0.9, pn=0.0, N_target=5.0)
 ```

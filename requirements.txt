@@ -1,5 +1,6 @@
 # Installs the group's quantum_sensing package (quantum_sensing/ at the repo root)
 # together with its dependencies, plus what this project needs on top.
 -e .
+# data/optimised_states/states.h5 is read with h5py (already a package dependency)
 matplotlib>=3.7
 pytest>=7.0
