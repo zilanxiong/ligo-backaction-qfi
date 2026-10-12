@@ -1,0 +1,5 @@
+# Installs the group's quantum_sensing package (vendored in quantum-sensing-py/)
+# together with its dependencies, plus what this project needs on top.
+-e ./quantum-sensing-py
+matplotlib>=3.7
+pytest>=7.0

@@ -1,0 +1,19 @@
+# Reproducible environment for this project.
+#   conda env create -f environment.yml
+#   conda activate ligo-backaction-qfi
+# The pip section installs the group's quantum_sensing package from the copy
+# vendored in quantum-sensing-py/, so no other repository is needed.
+name: ligo-backaction-qfi
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - numpy>=2.0,<2.3
+  - scipy>=1.13
+  - pandas>=2.0
+  - h5py
+  - matplotlib>=3.7
+  - pytest>=7.0
+  - pip
+  - pip:
+      - -r requirements.txt
