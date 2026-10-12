@@ -16,4 +16,4 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["quantum_sensing*"]
+include = ["quantum_sensing*", "backaction_qfi*"]
