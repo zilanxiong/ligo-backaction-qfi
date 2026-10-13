@@ -17,3 +17,6 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 include = ["quantum_sensing*", "backaction_qfi*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
