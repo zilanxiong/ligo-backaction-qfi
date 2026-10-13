@@ -18,6 +18,7 @@ kept as a read-only reference.
 | `environment.yml` | conda environment that reproduces this project's setup |
 | `requirements.txt` | the pip side of the same setup; installs the package above in editable mode |
 | `data/optimised_states/` | the group's previously optimised probes (no back-action), with the orientation note in its README |
+| `scripts/export_for_upstream.py` | assembles `for_upstream/`, this study laid out for the group's repository (see *Uploading to the group's repository*) |
 | `studies/` | the sweeps. `backaction_only.py`: QFI vs frequency and vs photon number with back-action only |
 | `results/`, `figures/` | outputs of the studies, one folder per study, with a `summary.md` each |
 | `tests/` | smoke tests for the environment, the Fock-cutoff convergence suite, the Gaussian benchmark suite, and the optimised-state loader |
@@ -107,3 +108,13 @@ python studies/backaction_only.py --figure-only   # re-render from saved CSVs
 Result: with back-action alone the QFI is frequency independent for every probe
 (the shear generator x² commutes with the signal generator x). See
 `results/backaction_only/summary.md` and `figures/backaction_only.png`.
+
+## Uploading to the group's repository
+
+The group's repository already holds the package (`python/`) and the optimised-state
+data, so only the study layer goes up. `python scripts/export_for_upstream.py` builds
+`for_upstream/`: a `backaction/` folder (code, studies, tests, results, figures, its own
+`pyproject.toml` and README) plus an `environment.yml` for the repository root, with
+paths already adapted (`-e ./python`, `-e ./backaction`, data via
+`QUANTUM_SENSING_DATA_DIR`). Copy `for_upstream/*` into the root of a clone of the
+group's repository, commit on a branch, push, open a pull request.
