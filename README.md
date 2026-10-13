@@ -4,10 +4,6 @@ Quantum Fisher information (QFI) of optical probe states under
 radiation-pressure back-action, built on the group's `quantum_sensing`
 package.
 
-This is a fresh start. The earlier, exploratory work lives in
-[LIGO-backaction-simulation](https://github.com/zilanxiong/LIGO-backaction-simulation),
-kept as a read-only reference.
-
 ## Layout
 
 | path | what it is |
@@ -110,12 +106,3 @@ Result: with back-action alone the QFI is frequency independent for every probe
 `results/backaction_only/summary.md` and the three figures in `figures/`: QFI vs frequency,
 the strain bound vs frequency, and QFI vs photon number.
 
-## Uploading to the group's repository
-
-The group's repository already holds the package (`python/`) and the optimised-state
-data, so only the study layer goes up. `python scripts/export_for_upstream.py` builds
-`for_upstream/`: a `backaction/` folder (code, studies, tests, results, figures, its own
-`pyproject.toml` and README) plus an `environment.yml` for the repository root, with
-paths already adapted (`-e ./python`, `-e ./backaction`, data via
-`QUANTUM_SENSING_DATA_DIR`). Copy `for_upstream/*` into the root of a clone of the
-group's repository, commit on a branch, push, open a pull request.
