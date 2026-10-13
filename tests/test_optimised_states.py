@@ -10,7 +10,8 @@ from quantum_sensing import calculate_qfi, get_state_single_mode
 
 
 def test_data_is_present_and_indexed():
-    assert (opt.DATA_DIR / "states.h5").exists()
+    assert (opt.DATA_DIR / "states.h5.gz").exists()     # what the repo carries (2.5 MB)
+    assert (opt.DATA_DIR / "states.h5").exists()        # unpacked on first use (29 MB, gitignored)
     assert (opt.DATA_DIR / "master_results.csv").exists()
     entries = opt.list_entries("fock_sup", "loss_ch", 0.9, 0.0)
     assert len(entries) > 10

@@ -6,7 +6,8 @@ superpositions (`sqz_vac`) and squeezed-coherent superpositions (`sqz_coh`),
 over loss placement (`loss_in`, `loss_ch`, `loss_out`), transmissivity `eta`,
 phase-noise rms `pn` and target photon number `N_target`.
 
-* `states.h5`: state parameters, read by `quantum_sensing.states.load_state_params`.
+* `states.h5.gz`: state parameters (gzipped, 2.5 MB). The loader unpacks it to `states.h5`
+  (29 MB, gitignored) on first use; `quantum_sensing.states.load_state_params` reads that.
 * `master_results.csv`: one row per optimisation run (`qfi`, `N_actual`, `N_basis`, ...).
 
 Copied unchanged from the archived repository (`reference/quantum_sensing/data`).

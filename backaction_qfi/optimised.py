@@ -21,15 +21,26 @@ import quantum_sensing as qs
 __all__ = ["DATA_DIR", "LOSS_KWARG", "list_entries", "best_entry", "rotate",
            "quarter_turn", "load_probe", "channel_kwargs"]
 
+def _unpack_if_needed(d):
+    """The repository stores ``states.h5.gz`` (2.5 MB); unpack to ``states.h5`` (29 MB) once."""
+    gz, h5 = d / "states.h5.gz", d / "states.h5"
+    if gz.exists() and not h5.exists():
+        import gzip
+        import shutil
+        with gzip.open(gz, "rb") as fin, open(h5, "wb") as fout:
+            shutil.copyfileobj(fin, fout)
+    return h5.exists()
+
+
 def _find_data_dir():
     """``data/optimised_states/`` next to this package if present, else the directory
     named by ``QUANTUM_SENSING_DATA_DIR`` (the package's own convention, used when
     this study layer lives inside the upstream repository)."""
     here = Path(__file__).resolve().parent.parent / "data" / "optimised_states"
-    if (here / "states.h5").exists():
+    if _unpack_if_needed(here):
         return here
     env = os.environ.get("QUANTUM_SENSING_DATA_DIR")
-    if env and (Path(env) / "states.h5").exists():
+    if env and _unpack_if_needed(Path(env)):
         return Path(env)
     return here        # may not exist; the first load then raises a clear error
 
@@ -41,10 +52,10 @@ LOSS_KWARG = {"loss_in": "eta_in", "loss_ch": "eta_ch", "loss_out": "eta_out"}
 
 
 def _use_data_dir():
-    if not (DATA_DIR / "states.h5").exists():
+    if not _unpack_if_needed(DATA_DIR):
         raise FileNotFoundError(
-            f"optimised-state data not found at {DATA_DIR}; put states.h5 and master_results.csv "
-            "there or set QUANTUM_SENSING_DATA_DIR to the directory that holds them")
+            f"optimised-state data not found at {DATA_DIR}; put states.h5 (or states.h5.gz) and "
+            "master_results.csv there or set QUANTUM_SENSING_DATA_DIR to the directory that holds them")
     qs.set_data_dir(DATA_DIR)
 
 
