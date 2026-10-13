@@ -107,7 +107,8 @@ python studies/backaction_only.py --figure-only   # re-render from saved CSVs
 
 Result: with back-action alone the QFI is frequency independent for every probe
 (the shear generator x² commutes with the signal generator x). See
-`results/backaction_only/summary.md` and `figures/backaction_only.png`.
+`results/backaction_only/summary.md` and the three figures in `figures/`: QFI vs frequency,
+the strain bound vs frequency, and QFI vs photon number.
 
 ## Uploading to the group's repository
 

@@ -126,88 +126,120 @@ def sweep_nbar(families):
     return pd.DataFrame(rows)
 
 
-def make_figure(df_f, df_n, path_png, path_svg):
+LEGEND = {
+    "squeezed": "Squeezed vac. (p)", "coherent": "Coherent", "cat": "Even cat",
+    "squeezed_cat": "Squeezed cat", "fock": "Fock",
+    "opt_fock_sup": "Optimized Fock sup. (no-BA, lossless)",
+    "opt_sqz_vac": "Optimized sqz-vac sup. (no-BA, lossless)",
+    "opt_sqz_coh": "Optimized sqz-coh sup. (no-BA, lossless)",
+}
+TITLE_CHANNEL = "backaction → displacement, no loss, no phase noise (⟨n⟩ = 5)"
+
+
+def _kappa_axis(ax):
+    """Top axis showing kappa_ba(Omega): ticks placed at the exact frequencies
+    where kappa hits each decade (kappa(f) is monotone decreasing, not a power law)."""
+    from matplotlib.ticker import FixedLocator, FixedFormatter, NullLocator
+    from quantum_sensing import rp_power_ratio
+    gamma = 2 * np.pi * 450.0
+    X = rp_power_ratio(gamma=gamma)
+
+    def k_to_f(k):           # invert kappa = 2 X g^4 / (W^2 (g^2 + W^2)) for W
+        W2 = 0.5 * (-gamma**2 + np.sqrt(gamma**4 + 8 * X * gamma**4 / np.asarray(k, float)))
+        return np.sqrt(W2) / (2 * np.pi)
+
+    fmin, fmax = ax.get_xlim()
+    decades = [10.0 ** e for e in range(2, -6, -1)]
+    ticks = [(k_to_f(k), e) for k, e in zip(decades, range(2, -6, -1)) if fmin <= k_to_f(k) <= fmax]
+    top = ax.twiny()
+    top.set_xscale("log"); top.set_xlim(fmin, fmax)
+    top.xaxis.set_major_locator(FixedLocator([f for f, _ in ticks]))
+    top.xaxis.set_major_formatter(FixedFormatter([f"$10^{{{e}}}$" for _, e in ticks]))
+    top.xaxis.set_minor_locator(NullLocator())
+    top.set_xlabel(r"$\kappa_{ba}(\Omega)$")
+    top.grid(False)
+    return top
+
+
+def _style():
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+    plt.rcdefaults()
+    plt.rcParams.update({"figure.figsize": (8, 5.3), "figure.dpi": 150, "savefig.dpi": 150,
+                         "axes.grid": True, "grid.alpha": 0.3, "legend.framealpha": 0.9,
+                         "lines.linewidth": 1.5, "lines.markersize": 4})
+    return plt
 
-    palette = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"]
-    color = dict(zip(FAMILIES, palette))
-    surface, ink, ink2, grid = "#fcfcfb", "#0b0b0b", "#52514e", "#e6e5e1"
-    plt.rcParams.update({"font.size": 10, "axes.edgecolor": ink2, "axes.labelcolor": ink,
-                         "xtick.color": ink2, "ytick.color": ink2, "text.color": ink,
-                         "axes.facecolor": surface, "figure.facecolor": surface,
-                         "axes.grid": True, "grid.color": grid, "grid.linewidth": 0.6,
-                         "axes.spines.top": False, "axes.spines.right": False})
-    fig, axes = plt.subplots(1, 3, figsize=(17, 5.6), gridspec_kw={"wspace": 0.75, "width_ratios": [1.15, 1, 1]})
-    fams = [f for f in FAMILIES if f in set(df_f.family)]
 
-    # (a) QFI vs frequency: exact line, Fock-track markers
-    ax = axes[0]
-    for fam in fams:
+def figure_qfi_vs_frequency(df_f, path):
+    plt = _style()
+    fig, ax = plt.subplots()
+    for fam in [f for f in FAMILIES if f in set(df_f.family)]:
         d = df_f[df_f.family == fam].sort_values("freq_hz")
-        ax.plot(d.freq_hz, d.qfi_exact, color=color[fam], lw=2, label=LABELS[fam])
-        ok = d[d.converged]
-        ax.plot(ok.freq_hz, ok.qfi_fock, "o", ms=5, color=color[fam], mec=surface, mew=1)
-        bad = d[~d.converged]
-        if len(bad):
-            ax.plot(bad.freq_hz, bad.qfi_fock, "x", ms=6, color=color[fam])
-    ax.set_xscale("log")
-    ax.set_xlabel("sideband frequency  Ω/2π  [Hz]")
-    ax.set_ylabel("QFI for the GW signal  F(ε_a)")
-    ax.set_title("(a) QFI vs frequency, back-action only, ⟨n⟩ = 5", loc="left", fontsize=10)
-    ax.text(0.02, 0.63, "lines: exact 8 Var(x)\n●  Fock track, converged cutoff\n×  Fock track, not converged",
-            transform=ax.transAxes, fontsize=8, color=ink2, va="top")
-    # direct labels at the right edge, stacked so they never overlap; a thin
-    # leader joins a displaced label to its line
-    vals = sorted(((df_f[df_f.family == f].qfi_exact.iloc[0], f) for f in fams), reverse=True)
-    ymax = vals[0][0]
-    ax.set_ylim(0, ymax * 1.08)
-    spacing = ymax * 1.08 * 0.038            # ~ one 7.5-pt line of text in data units
-    y_prev = np.inf
-    for v, f in vals:
-        y = min(v, y_prev - spacing)
-        if abs(y - v) > 0.3 * spacing:
-            ax.plot([1000, 1400], [v, y], color=grid, lw=0.8, clip_on=False, zorder=1)
-        ax.annotate(f"{LABELS[f]}  {v:.1f}", xy=(1400, y), xytext=(4, 0), textcoords="offset points",
-                    fontsize=7.5, color=ink, va="center", ha="left", annotation_clip=False)
-        y_prev = y
-
-    # (b) strain bound vs frequency
-    ax = axes[1]
-    for fam in fams:
-        d = df_f[df_f.family == fam].sort_values("freq_hz")
-        ax.plot(d.freq_hz, d.sigma_h_over_sql, color=color[fam], lw=2, label=LABELS[fam])
-    kk = rp_kappa(2 * np.pi * FREQS_HZ)
-    ax.plot(FREQS_HZ, np.ones_like(FREQS_HZ), "--", color=ink2, lw=1.2)
-    ax.text(FREQS_HZ[-1], 1.05, "SQL", ha="right", va="bottom", fontsize=8, color=ink2)
-    ax.plot(FREQS_HZ, np.sqrt((1 + kk**2) / (2 * kk)), ":", color=ink2, lw=1.2)
-    ax.text(FREQS_HZ[0], np.sqrt((1 + kk[0]**2) / (2 * kk[0])) * 1.1, "vacuum, phase readout", fontsize=8, color=ink2)
+        ok, skipped = d[d.converged], d[~d.converged]
+        line, = ax.plot(ok.freq_hz, ok.qfi_fock, "-o", label=LEGEND[fam])
+        if len(skipped):      # beyond the cutoff budget: exact value, hollow marker
+            ax.plot(skipped.freq_hz, skipped.qfi_exact, "o", mfc="white", color=line.get_color())
+            ax.plot([skipped.freq_hz.max(), ok.freq_hz.min()], [skipped.qfi_exact.iloc[0], ok.qfi_fock.iloc[0]],
+                    "-", color=line.get_color(), alpha=0.5)
     ax.set_xscale("log"); ax.set_yscale("log")
-    ax.set_xlabel("sideband frequency  Ω/2π  [Hz]")
-    ax.set_ylabel("strain bound  σ_h / h_SQL  = √(2/(κF))")
-    ax.set_title("(b) quantum Cramér-Rao bound on strain, relative to the SQL", loc="left", fontsize=10)
+    ax.set_xlabel(r"Frequency  $\Omega/2\pi$  [Hz]")
+    ax.set_ylabel(r"QFI for $\varepsilon_a$")
+    ax.set_title(TITLE_CHANNEL)
+    ax.grid(True, which="both", alpha=0.3)
+    _kappa_axis(ax)
+    ax.legend(loc="lower right", fontsize=8)
+    ax.text(0.01, 0.55, "filled: Fock track at converged cutoff\nhollow: exact 8 Var(x), beyond cutoff budget",
+            transform=ax.transAxes, fontsize=7, color="0.35", va="center")
+    fig.tight_layout(); fig.savefig(path); plt.close(fig)
+    print("figure:", path)
 
-    # (c) QFI vs nbar
-    ax = axes[2]
+
+def figure_strain_bound(df_f, path):
+    plt = _style()
+    fig, ax = plt.subplots()
+    for fam in [f for f in FAMILIES if f in set(df_f.family)]:
+        d = df_f[df_f.family == fam].sort_values("freq_hz")
+        ax.plot(d.freq_hz, d.sigma_h_over_sql, "-o", label=LEGEND[fam])
+    kk = rp_kappa(2 * np.pi * FREQS_HZ)
+    ax.plot(FREQS_HZ, np.ones_like(FREQS_HZ), "k--", lw=1, label="SQL")
+    ax.plot(FREQS_HZ, np.sqrt((1 + kk**2) / (2 * kk)), "k:", lw=1, label="Vacuum, phase-quadrature readout")
+    ax.set_xscale("log"); ax.set_yscale("log")
+    ax.set_xlabel(r"Frequency  $\Omega/2\pi$  [Hz]")
+    ax.set_ylabel(r"Strain bound  $\sigma_h / h_{\rm SQL} = \sqrt{2/(\kappa F)}$")
+    ax.set_title("Strain bound (quantum Cramér–Rao), " + TITLE_CHANNEL.replace(", no phase noise", ""))
+    ax.grid(True, which="both", alpha=0.3)
+    _kappa_axis(ax)
+    ax.legend(loc="upper left", fontsize=7)
+    fig.tight_layout(); fig.savefig(path); plt.close(fig)
+    print("figure:", path)
+
+
+def figure_qfi_vs_nbar(df_n, path):
+    plt = _style()
+    fig, ax = plt.subplots()
     for fam in [f for f in FAMILIES if f in set(df_n.family)]:
         d = df_n[df_n.family == fam].sort_values("nbar")
-        ax.plot(d.nbar, d.qfi_exact, "-o", ms=4, lw=2, color=color[fam], mec=surface, mew=0.8, label=LABELS[fam])
-    nn = np.logspace(np.log10(0.5), np.log10(40), 50)
-    ax.plot(nn, 8 * nn + 4, "--", color=ink2, lw=1); ax.text(0.55, 8 * 0.55 + 4, "8n+4", fontsize=8, color=ink2, va="top", ha="left")
-    ax.plot(nn, 4 * (1 + 2 * nn + 2 * np.sqrt(nn * (nn + 1))), ":", color=ink2, lw=1)
-    ax.text(30, 4 * (1 + 60 + 2 * np.sqrt(30 * 31)), "4(1+2n+2√(n(n+1)))", fontsize=8, color=ink2, va="bottom", ha="right")
+        ax.plot(d.nbar, d.qfi_exact, "-o", label=LEGEND[fam])
+    nn = np.logspace(np.log10(0.4), np.log10(45), 60)
+    ax.plot(nn, 8 * nn + 4, "k--", lw=1, label=r"Fock: $8n+4$")
+    ax.plot(nn, 4 * (1 + 2 * nn + 2 * np.sqrt(nn * (nn + 1))), "k:", lw=1,
+            label=r"Squeezed vac.: $4(1+2n+2\sqrt{n(n+1)})$")
     ax.set_xscale("log"); ax.set_yscale("log")
-    ax.set_xlabel("mean photon number  ⟨n⟩")
-    ax.set_ylabel("lossless QFI  F(ε_a) = 8 Var(x)")
-    ax.set_title("(c) scaling with photon number, lossless", loc="left", fontsize=10)
+    ax.set_xlabel(r"Mean photon number  $\langle n \rangle$")
+    ax.set_ylabel(r"Lossless QFI for $\varepsilon_a$  $= 8\,\mathrm{Var}(x)$")
+    ax.set_title("backaction → displacement, no loss: QFI vs photon number (any frequency)")
+    ax.grid(True, which="both", alpha=0.3)
+    ax.legend(loc="upper left", fontsize=8)
+    fig.tight_layout(); fig.savefig(path); plt.close(fig)
+    print("figure:", path)
 
-    handles, labels = axes[1].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="lower center", ncol=4, frameon=False, fontsize=8.5,
-               bbox_to_anchor=(0.5, 0.0))
-    fig.subplots_adjust(left=0.05, right=0.98, bottom=0.24, top=0.9, wspace=0.75)
-    fig.savefig(path_png, dpi=160); fig.savefig(path_svg)
-    print("figure:", path_png)
+
+def make_figures(df_f, df_n):
+    figure_qfi_vs_frequency(df_f, FIG / "backaction_only_qfi_vs_frequency.png")
+    figure_strain_bound(df_f, FIG / "backaction_only_strain_bound.png")
+    figure_qfi_vs_nbar(df_n, FIG / "backaction_only_qfi_vs_nbar.png")
 
 
 def write_summary(df_f, df_n, path):
@@ -257,7 +289,7 @@ def main():
         df_n = sweep_nbar(args.families)
         df_n.to_csv(OUT / "qfi_vs_nbar.csv", index=False)
     write_summary(df_f, df_n, OUT / "summary.md")
-    make_figure(df_f, df_n, FIG / "backaction_only.png", FIG / "backaction_only.svg")
+    make_figures(df_f, df_n)
 
 
 if __name__ == "__main__":
