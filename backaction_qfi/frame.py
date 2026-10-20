@@ -71,7 +71,13 @@ def unsheared_channel(*, kappa_ba=0.0, epsilon_a=0.0, eta_in=1.0, pn_in=0.0, eta
 
 
 def rp_qfi_unsheared(rho, *, param_value=0.0, **channel_kwargs):
-    """QFI for ``epsilon_a`` from the unsheared-frame channel (same signature as ``rp_qfi``)."""
-    channel_kwargs.setdefault("N_basis", rho.shape[0])
+    """QFI for ``epsilon_a`` from the unsheared-frame channel (same signature as ``rp_qfi``).
+
+    The input-noise stage does not depend on the signal, so it is run once and the
+    finite-difference evaluations start from its output.
+    """
+    N = int(channel_kwargs.pop("N_basis", rho.shape[0]))
+    eta_in, pn_in = channel_kwargs.pop("eta_in", 1.0), channel_kwargs.pop("pn_in", 0.0)
+    rho1 = unsheared_channel(rho=rho, N_basis=N, eta_in=eta_in, pn_in=pn_in, kappa_ba=0.0)   # stage 1 only
     return float(calculate_qfi(unsheared_channel, param_value=param_value, param_type="epsilon_a",
-                               rho=rho, **channel_kwargs))
+                               rho=rho1, N_basis=N, **channel_kwargs))

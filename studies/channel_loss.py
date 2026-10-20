@@ -11,7 +11,10 @@ Fock track: the exact shear-frame solver (backaction_qfi.frame), which needs onl
 ~200 levels at any kappa; cross-checked against the package's own density-matrix
 channel at the frequencies where that is cheap (small kappa, column qfi_mesolve).
 
-Usage:  python studies/channel_loss.py [--n-max 400] [--etas 0.95 ...] [--quick] [--figure-only]
+Usage:  python studies/channel_loss.py [--pn-in 0.2] [--etas 0.95 ...] [--quick] [--figure-only]
+With --pn-in, Gaussian-distributed phase noise of that rms (rad) acts on the probe before the
+sensing stage (the paper's preparation noise) and the optimised states are taken from the
+matching (loss_ch, eta, pn) slice.
 """
 
 import argparse
@@ -29,11 +32,12 @@ from backaction_qfi.convergence import default_ladder
 from quantum_sensing import rp_kappa
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "results" / "channel_loss"
+OUT = ROOT / "results" / "channel_loss"   # suffixed with the phase noise in main()
 FIG = ROOT / "figures"
 
 NBAR = 5.0
 ETAS = [0.95]
+PN_IN = 0.0            # set from --pn-in
 FREQS_HZ = np.logspace(1, 3, 25)
 N_REF = 400
 FRAME_LADDER = [120, 160, 220, 300, 400]
@@ -51,7 +55,7 @@ SLICE = "loss_ch"
 def _available_etas(state_type):
     df = pd.read_csv(opt.DATA_DIR / "master_results.csv", dtype={"valid": str})
     df = df[(df.valid.fillna("").str.lower() != "false") & (df.state_type == state_type)
-            & (df.loss_config == SLICE) & (df.pn == 0.0) & (df.N_target == NBAR)]
+            & (df.loss_config == SLICE) & (df.pn == PN_IN) & (df.N_target == NBAR)]
     return sorted(df.eta.unique())
 
 
@@ -60,13 +64,13 @@ def opt_slice(family, eta):
     if eta in avail:
         return eta, ""
     near = min(avail, key=lambda e: abs(e - eta))
-    return near, f"no {SLICE} entry at eta={eta}; nearest slice eta={near} used"
+    return near, f"no {SLICE} entry at eta={eta}, pn={PN_IN}; nearest slice eta={near} used"
 
 
 def probe(family, N, eta):
     if family.startswith("opt_"):
         e, _ = opt_slice(family, eta)
-        psi, _ = opt.load_probe(family[4:], SLICE, e, 0.0, NBAR, N_basis=N)
+        psi, _ = opt.load_probe(family[4:], SLICE, e, PN_IN, NBAR, N_basis=N)
         return psi
     return b.make_probe(family, N, NBAR)
 
@@ -79,14 +83,14 @@ def beta(eta):
 def reference(family, eta):
     """The kappa -> 0 (no back-action) value the sweep must reduce to at high frequency."""
     r = np.arcsinh(np.sqrt(NBAR))
-    if family == "squeezed":
+    if family == "squeezed" and PN_IN == 0.0:
         return beta(eta) ** 2 * 4 / (eta * np.exp(-2 * r) + 1 - eta), "closed form: beta² × paper Eq. 17"
-    if family == "coherent":
+    if family == "coherent" and PN_IN == 0.0:
         return 4 * beta(eta) ** 2, "closed form: 4 beta²"
     if family.startswith("opt_"):
         e, _ = opt_slice(family, eta)
-        return opt.best_entry(family[4:], SLICE, e, 0.0, NBAR)["qfi"], f"stored QFI (paper data, eta={e})"
-    return b.rp_qfi(probe(family, 200, eta), kappa_ba=0.0, eta_ch=eta), "no-back-action Fock value"
+        return opt.best_entry(family[4:], SLICE, e, PN_IN, NBAR)["qfi"], f"stored QFI (paper data, eta={e}, pn={PN_IN})"
+    return b.rp_qfi(probe(family, 200, eta), kappa_ba=0.0, eta_ch=eta, pn_in=PN_IN), "no-back-action Fock value"
 
 
 def sweep(etas, n_max, quick, checkpoint=None):
@@ -99,13 +103,13 @@ def sweep(etas, n_max, quick, checkpoint=None):
             ref, ref_src = reference(fam, eta)
             e_used, e_note = opt_slice(fam, eta) if fam.startswith("opt_") else (np.nan, "")
             nbar = b.mean_photon_number(probe(fam, N_REF, eta))
-            print(f"[eta_ch={eta}] [{fam}] <n>={nbar:.4f}  kappa->0 reference {ref:.4f} ({ref_src}) {e_note}", flush=True)
+            print(f"[eta_ch={eta} pn_in={PN_IN}] [{fam}] <n>={nbar:.4f}  kappa->0 reference {ref:.4f} ({ref_src}) {e_note}", flush=True)
             for f, k in zip(freqs, kappas):
                 t0 = time.time()
-                gauss = g.gaussian_qfi(GAUSSIAN[fam](NBAR), kappa_ba=k, eta_ch=eta) if fam in GAUSSIAN else np.nan
+                gauss = g.gaussian_qfi(GAUSSIAN[fam](NBAR), kappa_ba=k, eta_ch=eta) if (fam in GAUSSIAN and PN_IN == 0.0) else np.nan
                 # primary: the exact shear-frame solver (compact at any kappa); cross-check against
                 # the package's own density-matrix channel where that is cheap (small kappa)
-                res = b.converge(lambda N: b.rp_qfi_unsheared(probe(fam, N, eta), kappa_ba=k, eta_ch=eta, N_basis=N),
+                res = b.converge(lambda N: b.rp_qfi_unsheared(probe(fam, N, eta), kappa_ba=k, eta_ch=eta, pn_in=PN_IN, N_basis=N),
                                  cutoffs=FRAME_LADDER, rtol=1e-3, n_stable=2)
                 track = "frame"
                 predicted = b.suggested_cutoff(NBAR, k, safety=2.0)
@@ -114,10 +118,10 @@ def sweep(etas, n_max, quick, checkpoint=None):
                     rungs = [N for N in ladder if N >= max(40, int(0.6 * predicted))] or [n_max]
                     if len(rungs) < 2:
                         rungs = [rungs[0], n_max] if rungs[0] < n_max else [int(0.75 * n_max), n_max]
-                    chk = b.converge(lambda N: b.rp_qfi(probe(fam, N, eta), kappa_ba=k, eta_ch=eta, N_basis=N),
+                    chk = b.converge(lambda N: b.rp_qfi(probe(fam, N, eta), kappa_ba=k, eta_ch=eta, pn_in=PN_IN, N_basis=N),
                                      cutoffs=rungs, rtol=1e-3)
                     mes = chk.value if chk.converged else np.nan
-                rows.append(dict(eta_ch=eta, family=fam, freq_hz=f, kappa_ba=k, nbar=nbar, qfi_fock=res.value,
+                rows.append(dict(eta_ch=eta, pn_in=PN_IN, family=fam, freq_hz=f, kappa_ba=k, nbar=nbar, qfi_fock=res.value,
                                  cutoff=res.cutoff, converged=res.converged, track=track, qfi_reference=ref,
                                  reference_source=ref_src, ratio_to_reference=res.value / ref,
                                  qfi_gaussian=gauss, qfi_mesolve=mes, opt_eta_used=e_used, note=e_note, seconds=time.time() - t0))
@@ -168,7 +172,9 @@ def figure(df, eta, path):
             ax.plot(bad.freq_hz, bad.qfi_fock, "o", mfc="white", color=line.get_color())
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel(r"Frequency  $\Omega/2\pi$  [Hz]"); ax.set_ylabel(r"QFI for $\varepsilon_a$")
-    ax.set_title(f"backaction + channel loss ($\\eta_{{ch}}$ = {eta:g}) → displacement, ⟨n⟩ = 5")
+    pn = d_eta.pn_in.iloc[0] if "pn_in" in d_eta else 0.0
+    head = f"phase noise ({1000 * pn:.0f} mrad) → " if pn > 0 else ""
+    ax.set_title(head + f"backaction + channel loss ($\\eta_{{ch}}$ = {eta:g}) → displacement, ⟨n⟩ = 5", fontsize=11)
     ax.grid(True, which="both", alpha=0.3)
     _kappa_axis(ax)
     ax.legend(loc="lower right", fontsize=8)
@@ -184,7 +190,8 @@ def write_summary(df, path):
              "forms for squeezed vacuum and coherent light; exact κ = 0 Fock values for the rest.", ""]
     for eta in sorted(df.eta_ch.unique()):
         d_eta = df[df.eta_ch == eta]
-        lines += [f"## η_ch = {eta:g}", "",
+        pn = d_eta.pn_in.iloc[0] if "pn_in" in d_eta else 0.0
+        lines += [f"## η_ch = {eta:g}" + (f", input phase noise {1000 * pn:.0f} mrad" if pn > 0 else ""), "",
                   "| probe | κ→0 reference | source | F at 1 kHz | F at 30 Hz (κ≈1) | F at 10 Hz (κ≈9.5) | 10 Hz / 1 kHz | converged | package-channel cross-check (points, worst rel.) | largest cutoff |",
                   "|---|---|---|---|---|---|---|---|---|---|"]
         for fam in [f for f in FAMILIES if f in set(d_eta.family)]:
@@ -209,7 +216,12 @@ def main():
     ap.add_argument("--etas", nargs="*", type=float, default=ETAS)
     ap.add_argument("--quick", action="store_true")
     ap.add_argument("--figure-only", action="store_true")
+    ap.add_argument("--pn-in", type=float, default=0.0, help="input phase noise rms [rad]")
     args = ap.parse_args()
+    global PN_IN, OUT
+    PN_IN = args.pn_in
+    tag = f"_pn{PN_IN:g}".replace(".", "p") if PN_IN > 0 else ""
+    OUT = ROOT / "results" / ("channel_loss" + tag)
     OUT.mkdir(parents=True, exist_ok=True); FIG.mkdir(exist_ok=True)
     csv = OUT / "qfi_vs_frequency.csv"
     if args.figure_only:
@@ -220,7 +232,7 @@ def main():
         (OUT / "checkpoint.csv").unlink(missing_ok=True)
     write_summary(df, OUT / "summary.md")
     for eta in sorted(df.eta_ch.unique()):
-        figure(df, eta, FIG / (f"channel_loss_eta{eta:g}".replace(".", "p") + ".png"))
+        figure(df, eta, FIG / (f"channel_loss_eta{eta:g}".replace(".", "p") + tag + ".png"))
 
 
 if __name__ == "__main__":
