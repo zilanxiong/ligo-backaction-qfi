@@ -15,7 +15,7 @@ package.
 | `requirements.txt` | the pip side of the same setup; installs the package above in editable mode |
 | `data/optimised_states/` | the group's previously optimised probes (no back-action), with the orientation note in its README |
 | `scripts/export_for_upstream.py` | assembles `for_upstream/`, this study laid out for the group's repository (see *Uploading to the group's repository*) |
-| `studies/` | the sweeps. `backaction_only.py`: QFI vs frequency and vs photon number with back-action only |
+| `studies/` | the sweeps. `backaction_only.py`: QFI vs frequency with back-action only |
 | `results/`, `figures/` | outputs of the studies, one folder per study, with a `summary.md` each |
 | `tests/` | smoke tests for the environment, the Fock-cutoff convergence suite, the Gaussian benchmark suite, and the optimised-state loader |
 
@@ -103,6 +103,5 @@ python studies/backaction_only.py --figure-only   # re-render from saved CSVs
 
 Result: with back-action alone the QFI is frequency independent for every probe
 (the shear generator x² commutes with the signal generator x). See
-`results/backaction_only/summary.md` and the three figures in `figures/`: QFI vs frequency,
-the strain bound vs frequency, and QFI vs photon number.
+`results/backaction_only/summary.md` and `figures/backaction_only_qfi_vs_frequency.png`.
 

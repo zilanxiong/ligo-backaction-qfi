@@ -5,13 +5,10 @@ For every probe family the sweep reports
     density-matrix channel with a convergence-checked Fock cutoff (Fock track),
     next to the exact lossless value 8 Var(x) and, for Gaussian probes, the
     covariance-matrix track;
-  * the quantum Cramér-Rao bound on strain, sigma_h/h_SQL = sqrt(2/(kappa F)),
-    which *is* frequency dependent because kappa(Omega) enters the conversion;
-  * the scaling of the QFI with mean photon number.
 
 Usage:  python studies/backaction_only.py [--n-max 600] [--quick]
-Writes results/backaction_only/*.csv, results/backaction_only/summary.md and
-figures/backaction_only.{png,svg}.
+Writes results/backaction_only/qfi_vs_frequency.csv, results/backaction_only/summary.md
+and figures/backaction_only_qfi_vs_frequency.png.
 """
 
 import argparse
@@ -34,7 +31,6 @@ FIG = ROOT / "figures"
 
 NBAR = 5.0
 FREQS_HZ = np.logspace(1, 3, 25)
-NBARS = [1, 2, 3, 5, 8, 12, 20]
 N_REF = 400                      # cutoff for the exact (input-state) quantities
 
 #: Sweep order = plotting order = palette slot order.
@@ -58,13 +54,6 @@ def probe(family, N, nbar):
     return b.make_probe(family, N, nbar)
 
 
-def optimised_nbars(state_type):
-    df = pd.read_csv(opt.DATA_DIR / "master_results.csv", dtype={"valid": str})
-    df = df[(df.valid.fillna("").str.lower() != "false") & (df.state_type == state_type)
-            & (df.loss_config == "loss_ch") & (df.eta == 1.0) & (df.pn == 0.0)]
-    return sorted(df.N_target.unique())
-
-
 def sweep_frequency(families, n_max, quick):
     freqs = FREQS_HZ[::4] if quick else FREQS_HZ
     kappas = rp_kappa(2 * np.pi * freqs)
@@ -82,8 +71,7 @@ def sweep_frequency(families, n_max, quick):
                 rows.append(dict(family=fam, freq_hz=f, kappa_ba=k, nbar=nbar, qfi_fock=np.nan,
                                  cutoff=0, converged=False, qfi_exact=exact,
                                  qfi_gaussian=g.gaussian_qfi(GAUSSIAN[fam](NBAR), kappa_ba=k) if fam in GAUSSIAN else np.nan,
-                                 rel_err_fock=np.nan, sigma_h_over_sql=np.sqrt(2.0 / (k * exact)),
-                                 sigma_h=np.sqrt(2.0 / (k * exact)) * g.h_sql(2 * np.pi * f), seconds=0.0,
+                                 rel_err_fock=np.nan, seconds=0.0,
                                  note=f"skipped: predicted cutoff {predicted} > budget {n_max}"))
                 print(f"   f={f:7.1f} Hz  kappa={k:8.4f}  Fock track skipped (predicted cutoff {predicted} > {n_max})", flush=True)
                 continue
@@ -96,8 +84,6 @@ def sweep_frequency(families, n_max, quick):
             rows.append(dict(family=fam, freq_hz=f, kappa_ba=k, nbar=nbar, qfi_fock=res.value,
                              cutoff=res.cutoff, converged=res.converged, qfi_exact=exact,
                              qfi_gaussian=gauss, rel_err_fock=(res.value - exact) / exact,
-                             sigma_h_over_sql=np.sqrt(2.0 / (k * exact)),
-                             sigma_h=np.sqrt(2.0 / (k * exact)) * g.h_sql(2 * np.pi * f),
                              seconds=time.time() - t0, note=""))
             flag = "" if res.converged else "  NOT CONVERGED"
             print(f"   f={f:7.1f} Hz  kappa={k:8.4f}  F_fock={res.value:9.4f} @N={res.cutoff:<4d} "
@@ -126,27 +112,6 @@ def fill_pure(df_f):
             "pure-state Fock track (sesolve), beyond density-matrix cutoff budget"]
         print(f"   [{fam}] f={df_f.at[i, 'freq_hz']:6.1f} Hz kappa={k:.3f}: pure track {res}  rel {(res.value-exact)/exact:+.1e}  {time.time()-t0:.0f}s", flush=True)
     return df_f
-
-
-def sweep_nbar(families):
-    rows = []
-    for fam in families:
-        if fam.startswith("opt_"):
-            nbars = optimised_nbars(fam[4:])
-        elif fam == "fock":
-            nbars = [n for n in NBARS]
-        else:
-            nbars = NBARS
-        for n in nbars:
-            try:
-                psi = probe(fam, N_REF, n)
-            except (ValueError, LookupError) as e:
-                print(f"   skip {fam} nbar={n}: {e}")
-                continue
-            tail = b.tail_population(psi)
-            rows.append(dict(family=fam, nbar_target=n, nbar=b.mean_photon_number(psi),
-                             var_x=b.var_x(psi), qfi_exact=8 * b.var_x(psi), tail_population=tail))
-    return pd.DataFrame(rows)
 
 
 LEGEND = {
@@ -213,89 +178,31 @@ def figure_qfi_vs_frequency(df_f, path):
     ax.grid(True, which="both", alpha=0.3)
     _kappa_axis(ax)
     ax.legend(loc="lower right", fontsize=8)
-    pure = df_f[df_f.get("track", "mesolve") == "pure"]
-    note = "markers: Fock track at converged cutoff"
-    if len(pure):
-        note += (f"\n(below {pure.freq_hz.max():.0f} Hz: pure-state solve, cutoff up to {int(pure.cutoff.max())})")
-    if (~df_f.converged).any():
-        note += "\nhollow: exact 8 Var(x), not converged"
-    ax.text(0.01, 0.55, note, transform=ax.transAxes, fontsize=7, color="0.35", va="center")
     fig.tight_layout(); fig.savefig(path); plt.close(fig)
     print("figure:", path)
 
 
-def figure_strain_bound(df_f, path):
-    plt = _style()
-    fig, ax = plt.subplots()
-    for fam in [f for f in FAMILIES if f in set(df_f.family)]:
-        d = df_f[df_f.family == fam].sort_values("freq_hz")
-        ax.plot(d.freq_hz, d.sigma_h_over_sql, "-o", label=LEGEND[fam])
-    kk = rp_kappa(2 * np.pi * FREQS_HZ)
-    ax.plot(FREQS_HZ, np.ones_like(FREQS_HZ), "k--", lw=1, label="SQL")
-    ax.plot(FREQS_HZ, np.sqrt((1 + kk**2) / (2 * kk)), "k:", lw=1, label="Vacuum, phase-quadrature readout")
-    ax.set_xscale("log"); ax.set_yscale("log")
-    ax.set_xlabel(r"Frequency  $\Omega/2\pi$  [Hz]")
-    ax.set_ylabel(r"Strain bound  $\sigma_h / h_{\rm SQL} = \sqrt{2/(\kappa F)}$")
-    ax.set_title("Strain bound (quantum Cramér–Rao), " + TITLE_CHANNEL)
-    ax.grid(True, which="both", alpha=0.3)
-    _kappa_axis(ax)
-    ax.legend(loc="upper left", fontsize=7)
-    fig.tight_layout(); fig.savefig(path); plt.close(fig)
-    print("figure:", path)
-
-
-def figure_qfi_vs_nbar(df_n, path):
-    plt = _style()
-    fig, ax = plt.subplots()
-    for fam in [f for f in FAMILIES if f in set(df_n.family)]:
-        d = df_n[df_n.family == fam].sort_values("nbar")
-        ax.plot(d.nbar, d.qfi_exact, "-o", label=LEGEND[fam])
-    nn = np.logspace(np.log10(0.4), np.log10(45), 60)
-    ax.plot(nn, 8 * nn + 4, "k--", lw=1, label=r"Fock: $8n+4$")
-    ax.plot(nn, 4 * (1 + 2 * nn + 2 * np.sqrt(nn * (nn + 1))), "k:", lw=1,
-            label=r"Squeezed vac.: $4(1+2n+2\sqrt{n(n+1)})$")
-    ax.set_xscale("log"); ax.set_yscale("log")
-    ax.set_xlabel(r"Mean photon number  $\langle n \rangle$")
-    ax.set_ylabel(r"Lossless QFI for $\varepsilon_a$  $= 8\,\mathrm{Var}(x)$")
-    ax.set_title("backaction → displacement: QFI vs photon number")
-    ax.grid(True, which="both", alpha=0.3)
-    ax.legend(loc="upper left", fontsize=8)
-    fig.tight_layout(); fig.savefig(path); plt.close(fig)
-    print("figure:", path)
-
-
-def make_figures(df_f, df_n):
+def make_figures(df_f):
     figure_qfi_vs_frequency(df_f, FIG / "backaction_only_qfi_vs_frequency.png")
-    figure_strain_bound(df_f, FIG / "backaction_only_strain_bound.png")
-    figure_qfi_vs_nbar(df_n, FIG / "backaction_only_qfi_vs_nbar.png")
 
 
-def write_summary(df_f, df_n, path):
+def write_summary(df_f, path):
     lines = ["# Back-action only, ⟨n⟩ = 5, 10 Hz – 1 kHz", "",
              "Channel: unitary, `H = √2 ε_a x + (κ/2) x²`, no loss, no phase noise. κ(Ω) from",
              "`quantum_sensing.rp_kappa` (package LIGO defaults). QFI for `ε_a` at `ε_a = 0`.", "",
              "## Result", "",
              "The QFI is **frequency independent** for every probe: `x²` commutes with the signal",
              "generator `x`, so `F = 8 Var(x)` of the input, exactly. The Fock track reproduces this",
-             "at every frequency where its cutoff ladder converged. The strain bound",
-             "`σ_h/h_SQL = √(2/(κF))` is frequency dependent through κ(Ω) only.", "",
-             "| probe | ⟨n⟩ | F exact (8 Var x) | Fock-track range over f | worst rel. err. | converged points | largest cutoff | σ_h/h_SQL at 30 Hz |",
-             "|---|---|---|---|---|---|---|---|"]
+             "at every frequency.", "",
+             "| probe | ⟨n⟩ | F exact (8 Var x) | Fock-track range over f | worst rel. err. | converged points | largest cutoff |",
+             "|---|---|---|---|---|---|---|"]
     for fam in [f for f in FAMILIES if f in set(df_f.family)]:
         d = df_f[df_f.family == fam]
         ok = d[d.converged]
-        i30 = (d.freq_hz - 30).abs().idxmin()
         npure = int((d.get("track", "mesolve") == "pure").sum())
         lines.append(f"| {LABELS[fam]} | {d.nbar.iloc[0]:.3f} | {d.qfi_exact.iloc[0]:.3f} | "
                      f"{ok.qfi_fock.min():.3f} – {ok.qfi_fock.max():.3f} | {ok.rel_err_fock.abs().max():.1e} | "
-                     f"{len(ok)}/{len(d)} ({npure} via pure-state track) | {int(d.cutoff.max())} | {d.loc[i30, 'sigma_h_over_sql']:.3f} |")
-    lines += ["", "## Photon-number scaling (exact, lossless)", "",
-              "| probe | ⟨n⟩ values | F at ⟨n⟩ = 5 | F at largest ⟨n⟩ | local slope at top |", "|---|---|---|---|---|"]
-    for fam in [f for f in FAMILIES if f in set(df_n.family)]:
-        d = df_n[df_n.family == fam].sort_values("nbar")
-        f5 = d.iloc[(d.nbar - 5).abs().argmin()].qfi_exact
-        slope = np.polyfit(np.log(d.nbar.values[-2:]), np.log(d.qfi_exact.values[-2:]), 1)[0] if len(d) > 1 else np.nan
-        lines.append(f"| {LABELS[fam]} | {', '.join(f'{v:g}' for v in d.nbar_target)} | {f5:.2f} | {d.qfi_exact.iloc[-1]:.2f} | {slope:.2f} |")
+                     f"{len(ok)}/{len(d)} ({npure} via pure-state track) | {int(d.cutoff.max())} |")
     path.write_text("\n".join(lines) + "\n")
     print("summary:", path)
 
@@ -312,17 +219,14 @@ def main():
 
     if args.figure_only or args.fill_pure:
         df_f = pd.read_csv(OUT / "qfi_vs_frequency.csv"); df_f["note"] = df_f["note"].fillna("")
-        df_n = pd.read_csv(OUT / "qfi_vs_nbar.csv")
         if args.fill_pure:
             df_f = fill_pure(df_f)
             df_f.to_csv(OUT / "qfi_vs_frequency.csv", index=False)
     else:
         df_f = sweep_frequency(args.families, args.n_max, args.quick)
         df_f.to_csv(OUT / "qfi_vs_frequency.csv", index=False)
-        df_n = sweep_nbar(args.families)
-        df_n.to_csv(OUT / "qfi_vs_nbar.csv", index=False)
-    write_summary(df_f, df_n, OUT / "summary.md")
-    make_figures(df_f, df_n)
+    write_summary(df_f, OUT / "summary.md")
+    make_figures(df_f)
 
 
 if __name__ == "__main__":
