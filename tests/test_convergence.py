@@ -165,3 +165,23 @@ def test_pure_state_track_reaches_large_shear():
     # cheap as a ket.  Lossless, so the answer is 8 Var(x) of the input.
     psi = b.squeezed(1200, 5.0)
     assert b.rp_qfi_pure(psi, kappa_ba=9.53) == pytest.approx(8 * b.var_x(psi), rel=1e-6)
+
+
+# --- branch method: input noise -> lossless sensing unitary ---------------------
+
+def test_branch_method_matches_density_matrix_track_with_input_loss():
+    psi = b.cat_even(60, 2.0)
+    kw = dict(kappa_ba=1.0, eta_in=0.9)
+    assert b.rp_qfi_input_noise_branches(psi, N_unitary=120, **kw) == pytest.approx(b.rp_qfi(psi, **kw), rel=1e-6)
+
+
+def test_branch_method_matches_gaussian_track_at_large_shear():
+    import backaction_qfi.gaussian as g
+    psi = b.squeezed(160, 5.0)
+    got = b.rp_qfi_input_noise_branches(psi, kappa_ba=9.53, eta_in=0.9, N_unitary=1200)
+    assert got == pytest.approx(g.gaussian_qfi(g.squeezed_at_fixed_nbar(5.0), kappa_ba=9.53, eta_in=0.9), rel=1e-5)
+
+
+def test_branch_method_reduces_to_pure_track_without_noise():
+    psi = b.fock(40, 5)
+    assert b.rp_qfi_input_noise_branches(psi, kappa_ba=2.0, N_unitary=160) == pytest.approx(b.rp_qfi_pure(psi, kappa_ba=2.0, N_basis=160), rel=1e-7)

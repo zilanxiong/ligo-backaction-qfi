@@ -12,6 +12,8 @@ itself and the package source are never modified.
 
 import contextlib
 
+import numpy as np
+
 import qutip
 
 import quantum_sensing.dynamics as _dynamics
@@ -88,6 +90,9 @@ def rp_qfi_pure(psi, *, kappa_ba=0.0, param_value=0.0, N_basis=None, prec=1e-5):
     """
     from quantum_sensing.conversions import ba_to_g
     N = int(N_basis or psi.shape[0])
+    if psi.shape[0] != N:                      # embed (or truncate) the ket in the requested cutoff
+        v = np.zeros(N, dtype=complex); n = min(N, psi.shape[0]); v[:n] = psi.full().ravel()[:n]
+        psi = qutip.Qobj(v).unit()
     a = qutip.destroy(N)
     x2 = (a + a.dag()) ** 2 / 2
     H_ba = ba_to_g(kappa_ba, 1.0) * x2

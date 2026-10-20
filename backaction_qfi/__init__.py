@@ -11,6 +11,7 @@ from .probes import (coherent, squeezed, cat_even, cat, squeezed_cat, fock,
                      mean_photon_number, var_x, FAMILIES, make_probe)
 from .gaussian import gaussian_channel, gaussian_qfi, homodyne_noise_spectrum, fd_squeeze_angle, strain_noise_from_qfi
 from .optimised import load_probe, quarter_turn, rotate
+from .branches import rp_qfi_input_noise_branches
 from .convergence import (
     ConvergenceResult, converge, converged_qfi, tail_population, suggested_cutoff,
 )
@@ -21,5 +22,5 @@ __all__ = [
     "FAMILIES", "make_probe",
     "ConvergenceResult", "converge", "converged_qfi", "tail_population", "suggested_cutoff",
     "gaussian_channel", "gaussian_qfi", "homodyne_noise_spectrum", "fd_squeeze_angle", "strain_noise_from_qfi",
-    "load_probe", "quarter_turn", "rotate",
+    "load_probe", "quarter_turn", "rotate", "rp_qfi_input_noise_branches",
 ]
