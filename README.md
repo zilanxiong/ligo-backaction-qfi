@@ -15,7 +15,7 @@ package.
 | `requirements.txt` | the pip side of the same setup; installs the package above in editable mode |
 | `data/optimised_states/` | the group's previously optimised probes (no back-action), with the orientation note in its README |
 | `scripts/export_for_upstream.py` | assembles `for_upstream/`, this study laid out for the group's repository (see *Uploading to the group's repository*) |
-| `studies/` | the sweeps. `backaction_only.py`: QFI vs frequency with back-action only |
+| `studies/` | the sweeps. `backaction_only.py`: QFI vs frequency with back-action only. `input_loss.py`: input loss (transmission 0.95) + back-action, checked against the paper's numbers |
 | `results/`, `figures/` | outputs of the studies, one folder per study, with a `summary.md` each |
 | `tests/` | smoke tests for the environment, the Fock-cutoff convergence suite, the Gaussian benchmark suite, and the optimised-state loader |
 
@@ -105,3 +105,13 @@ Result: with back-action alone the QFI is frequency independent for every probe
 (the shear generator x² commutes with the signal generator x). See
 `results/backaction_only/summary.md` and `figures/backaction_only_qfi_vs_frequency.png`.
 
+
+### Input loss + back-action (`studies/input_loss.py`)
+
+Same probes and frequencies, with 5 % input loss (the paper's headline transmission 0.95) and
+the optimised states taken from the paper's matching `loss_in` slice. Input loss acts before
+the sensing unitary, so the QFI is frequency independent and must equal its no-back-action
+value: the sweep reproduces the paper's stored QFI and closed forms to 1e-7 for the Fock
+superposition, squeezed vacuum and coherent light. Beyond the density-matrix cutoff budget
+the exact branch method (`backaction_qfi.branches`) carries the low-frequency points. See
+`results/input_loss/summary.md`.

@@ -1,4 +1,4 @@
-"""Input loss + back-action, nbar = 5, 10 Hz - 1 kHz, one figure per transmission.
+"""Input loss + back-action, nbar = 5, 10 Hz - 1 kHz, at the paper's headline transmission 0.95.
 
 Baseline check against the paper (Maliakal et al.): input loss acts before the
 sensing unitary and commutes with nothing that follows in a way that could
@@ -35,7 +35,7 @@ OUT = ROOT / "results" / "input_loss"
 FIG = ROOT / "figures"
 
 NBAR = 5.0
-ETAS = [0.85, 0.9, 0.95, 0.99, 0.999]
+ETAS = [0.95]          # the paper's headline transmission (5 % loss); others via --etas
 FREQS_HZ = np.logspace(1, 3, 25)
 N_REF = 400
 BRANCH_LADDER = [800, 1120, 1600, 2240]
@@ -90,7 +90,7 @@ def reference(family, eta):
     return b.rp_qfi_input_noise_branches(psi, kappa_ba=0.0, eta_in=eta, N_unitary=400), "no-back-action Fock value"
 
 
-def sweep(etas, n_max, quick):
+def sweep(etas, n_max, quick, checkpoint=None):
     freqs = FREQS_HZ[::4] if quick else FREQS_HZ
     kappas = rp_kappa(2 * np.pi * freqs)
     ladder = [N for N in default_ladder(40, n_max) if N <= n_max]
@@ -130,6 +130,8 @@ def sweep(etas, n_max, quick):
                 flag = "" if res.converged else "  NOT CONVERGED"
                 print(f"   f={f:7.1f} Hz kappa={k:8.4f}  F={res.value:9.4f} @N={res.cutoff:<4d} [{track}] "
                       f"(ref {ref:.4f}, rel {rows[-1]['rel_err_vs_reference']:+.1e})  {rows[-1]['seconds']:.0f}s{flag}", flush=True)
+            if checkpoint is not None:
+                pd.DataFrame(rows).to_csv(checkpoint, index=False)
     return pd.DataFrame(rows)
 
 
@@ -216,14 +218,12 @@ def main():
     if args.figure_only:
         df = pd.read_csv(csv); df["note"] = df["note"].fillna("")
     else:
-        df = sweep(args.etas, args.n_max, args.quick)
-        if csv.exists():     # merge with any previously computed transmissions
-            old = pd.read_csv(csv); old["note"] = old["note"].fillna("")
-            df = pd.concat([old[~old.eta_in.isin(df.eta_in.unique())], df], ignore_index=True)
+        df = sweep(args.etas, args.n_max, args.quick, checkpoint=OUT / "checkpoint.csv")
         df.to_csv(csv, index=False)
+        (OUT / "checkpoint.csv").unlink(missing_ok=True)
     write_summary(df, OUT / "summary.md")
     for eta in sorted(df.eta_in.unique()):
-        figure(df, eta, FIG / f"input_loss_eta{eta:g}".replace(".", "p") + ".png")
+        figure(df, eta, FIG / (f"input_loss_eta{eta:g}".replace(".", "p") + ".png"))
 
 
 if __name__ == "__main__":
