@@ -9,13 +9,13 @@ package.
 | path | what it is |
 |---|---|
 | `quantum_sensing/` | the group's single-mode sensing package, vendored unmodified from `shruti-jm/quantum-sensing` (`python/quantum_sensing/`). Not edited here |
-| `backaction_qfi/` | the study layer, built *on top of* the package without editing it: `solver` (tight ODE tolerances injected from outside, `rp_channel`, `rp_qfi`), `probes` (coherent, squeezed, cat, Fock at a given cutoff), `convergence` (Fock-cutoff ladder, truncation alarm), `gaussian` (covariance-matrix track: exact for Gaussian probes, SQL / variational / FD-squeezing curves, strain conversion), `optimised` (loads the group's optimised probes, rotated onto the GW signal) |
+| `backaction_qfi/` | the study layer, built *on top of* the package without editing it: `solver` (tight ODE tolerances injected from outside, `rp_channel`, `rp_qfi`, pure-state track), `branches` (input noise then the lossless unitary, exact at large cutoffs), `frame` (the channel in the frame moving with the shear: exact at any κ with ~200 levels), `probes` (coherent, squeezed, cat, Fock at a given cutoff), `convergence` (Fock-cutoff ladder, truncation alarm), `gaussian` (covariance-matrix track: exact for Gaussian probes, SQL / variational / FD-squeezing curves, strain conversion), `optimised` (loads the group's optimised probes, rotated onto the GW signal) |
 | `pyproject.toml` | packaging for both, so `pip install -e .` installs them |
 | `environment.yml` | conda environment that reproduces this project's setup |
 | `requirements.txt` | the pip side of the same setup; installs the package above in editable mode |
 | `data/optimised_states/` | the group's previously optimised probes (no back-action), with the orientation note in its README |
 | `scripts/export_for_upstream.py` | assembles `for_upstream/`, this study laid out for the group's repository (see *Uploading to the group's repository*) |
-| `studies/` | the sweeps. `backaction_only.py`: QFI vs frequency with back-action only. `input_loss.py`: input loss (transmission 0.95) + back-action, checked against the paper's numbers |
+| `studies/` | the sweeps. `backaction_only.py`: QFI vs frequency with back-action only. `input_loss.py`: input loss (transmission 0.95) + back-action, checked against the paper's numbers. `channel_loss.py`: loss concurrent with the shear, the first frequency-dependent case |
 | `results/`, `figures/` | outputs of the studies, one folder per study, with a `summary.md` each |
 | `tests/` | smoke tests for the environment, the Fock-cutoff convergence suite, the Gaussian benchmark suite, and the optimised-state loader |
 
@@ -115,3 +115,12 @@ value: the sweep reproduces the paper's stored QFI and closed forms to 1e-7 for 
 superposition, squeezed vacuum and coherent light. Beyond the density-matrix cutoff budget
 the exact branch method (`backaction_qfi.branches`) carries the low-frequency points. See
 `results/input_loss/summary.md`.
+
+### Channel loss + back-action (`studies/channel_loss.py`)
+
+5 % loss *during* the sensing stage, in the same master-equation solve as the shear and
+the signal. The first frequency-dependent result: every probe loses most of its QFI
+below ~30 Hz (κ ≳ 1). Primary track: the exact shear-frame solver
+(`backaction_qfi.frame`), which keeps the state compact at any κ; cross-checked against
+the package's own density-matrix channel at the low-κ points, and at κ → 0 against the
+paper's stored QFI and the β² closed forms. See `results/channel_loss/summary.md`.

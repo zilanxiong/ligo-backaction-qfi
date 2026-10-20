@@ -185,3 +185,20 @@ def test_branch_method_matches_gaussian_track_at_large_shear():
 def test_branch_method_reduces_to_pure_track_without_noise():
     psi = b.fock(40, 5)
     assert b.rp_qfi_input_noise_branches(psi, kappa_ba=2.0, N_unitary=160) == pytest.approx(b.rp_qfi_pure(psi, kappa_ba=2.0, N_basis=160), rel=1e-7)
+
+
+# --- shear-frame (unsheared) solver ----------------------------------------------
+
+@pytest.mark.parametrize("kw", [dict(kappa_ba=1.5, eta_ch=0.95), dict(kappa_ba=2.0, eta_ch=0.9, eta_in=0.9),
+                                dict(kappa_ba=1.0, eta_in=0.9, eta_ch=0.95, eta_out=0.9, pn_in=0.1)])
+def test_unsheared_frame_matches_density_matrix_track(kw):
+    psi = b.cat_even(100, 2.0)
+    assert b.rp_qfi_unsheared(psi, **kw) == pytest.approx(b.rp_qfi(psi, **kw), rel=1e-5)
+
+
+@pytest.mark.parametrize("kw", [dict(kappa_ba=9.53, eta_ch=0.95), dict(kappa_ba=9.53, eta_out=0.95),
+                                dict(kappa_ba=9.53, eta_in=0.95, eta_ch=0.95, eta_out=0.95)])
+def test_unsheared_frame_matches_gaussian_track_at_large_shear(kw):
+    import backaction_qfi.gaussian as g
+    got = b.rp_qfi_unsheared(b.squeezed(220, 5.0), **kw)
+    assert got == pytest.approx(g.gaussian_qfi(g.squeezed_at_fixed_nbar(5.0), **kw), rel=1e-5)
