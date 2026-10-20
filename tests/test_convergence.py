@@ -151,3 +151,17 @@ def test_squeezed_cat_interpolates_between_cat_and_squeezed_vacuum():
     # the lossless sweep cannot separate the two).
     vx_half = b.var_x(squeezed_cat(N, 5.0, 0.5))
     assert b.var_x(b.cat(N, 5.0)) < vx_half <= b.var_x(b.squeezed(N, 5.0)) * 1.001
+
+
+# --- pure-state Fock track (lossless) ---------------------------------------------
+
+def test_pure_state_track_matches_density_matrix_track():
+    psi = b.cat_even(60, 2.0)
+    assert b.rp_qfi_pure(psi, kappa_ba=1.0) == pytest.approx(b.rp_qfi(psi, kappa_ba=1.0), rel=1e-7)
+
+
+def test_pure_state_track_reaches_large_shear():
+    # kappa ~ 9.5 is the 10 Hz point of the sweep: beyond the density-matrix budget,
+    # cheap as a ket.  Lossless, so the answer is 8 Var(x) of the input.
+    psi = b.squeezed(1200, 5.0)
+    assert b.rp_qfi_pure(psi, kappa_ba=9.53) == pytest.approx(8 * b.var_x(psi), rel=1e-6)

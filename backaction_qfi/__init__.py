@@ -6,7 +6,7 @@ ODE tolerances injected from outside), probe states come from :mod:`.probes`,
 and every user-facing number goes through :mod:`.convergence`.
 """
 
-from .solver import SOLVER_OPTIONS, tight_solver, rp_channel, rp_qfi
+from .solver import SOLVER_OPTIONS, tight_solver, rp_channel, rp_qfi, rp_qfi_pure
 from .probes import (coherent, squeezed, cat_even, cat, squeezed_cat, fock,
                      mean_photon_number, var_x, FAMILIES, make_probe)
 from .gaussian import gaussian_channel, gaussian_qfi, homodyne_noise_spectrum, fd_squeeze_angle, strain_noise_from_qfi
@@ -16,7 +16,7 @@ from .convergence import (
 )
 
 __all__ = [
-    "SOLVER_OPTIONS", "tight_solver", "rp_channel", "rp_qfi",
+    "SOLVER_OPTIONS", "tight_solver", "rp_channel", "rp_qfi", "rp_qfi_pure",
     "coherent", "squeezed", "cat_even", "cat", "squeezed_cat", "fock", "mean_photon_number", "var_x",
     "FAMILIES", "make_probe",
     "ConvergenceResult", "converge", "converged_qfi", "tail_population", "suggested_cutoff",

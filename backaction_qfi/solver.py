@@ -18,7 +18,7 @@ import quantum_sensing.dynamics as _dynamics
 from quantum_sensing.sld import calculate_qfi
 from quantum_sensing.dynamics import get_state_single_mode_rp
 
-__all__ = ["SOLVER_OPTIONS", "tight_solver", "rp_channel", "rp_qfi"]
+__all__ = ["SOLVER_OPTIONS", "tight_solver", "rp_channel", "rp_qfi", "rp_qfi_pure"]
 
 #: Tolerances used for every ``mesolve`` call made through this module.
 SOLVER_OPTIONS = {"atol": 1e-12, "rtol": 1e-10, "nsteps": 100_000}
@@ -73,3 +73,29 @@ def rp_qfi(rho, *, param_type="epsilon_a", param_value=0.0, **channel_kwargs):
     channel_kwargs.setdefault("N_basis", rho.shape[0])
     return float(calculate_qfi(rp_channel, param_value=param_value,
                                param_type=param_type, rho=rho, **channel_kwargs))
+
+
+def rp_qfi_pure(psi, *, kappa_ba=0.0, param_value=0.0, N_basis=None, prec=1e-5):
+    """Lossless back-action channel propagated as a *pure state* (``qutip.sesolve``).
+
+    Same Hamiltonian as the package's sensing stage with every noise term off,
+    ``H = epsilon_a (a + a†) + (kappa_ba/2) x²``, over unit time; the QFI for
+    ``epsilon_a`` from the pure-state formula ``4(⟨∂ψ|∂ψ⟩ - |⟨ψ|∂ψ⟩|²)`` with
+    central differences.  A ket of ``N`` entries instead of an ``N×N`` density
+    matrix, so cutoffs of a few thousand are cheap: used where the
+    density-matrix track runs out of cutoff budget (large ``kappa_ba``).
+    Only valid when the state stays pure, i.e. no loss and no dephasing.
+    """
+    from quantum_sensing.conversions import ba_to_g
+    N = int(N_basis or psi.shape[0])
+    a = qutip.destroy(N)
+    x2 = (a + a.dag()) ** 2 / 2
+    H_ba = ba_to_g(kappa_ba, 1.0) * x2
+
+    def out(eps):
+        H = H_ba + eps * (a.dag() + a)
+        return qutip.sesolve(H, psi, [0.0, 1.0], options=dict(SOLVER_OPTIONS)).states[-1]
+
+    plus, minus, centre = out(param_value + prec), out(param_value - prec), out(param_value)
+    dpsi = (plus - minus) / (2 * prec)
+    return float(4 * (dpsi.overlap(dpsi).real - abs(centre.overlap(dpsi)) ** 2))

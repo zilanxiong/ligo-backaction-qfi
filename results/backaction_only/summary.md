@@ -12,14 +12,14 @@ at every frequency where its cutoff ladder converged. The strain bound
 
 | probe | ⟨n⟩ | F exact (8 Var x) | Fock-track range over f | worst rel. err. | converged points | largest cutoff | σ_h/h_SQL at 30 Hz |
 |---|---|---|---|---|---|---|---|
-| squeezed vacuum | 5.000 | 87.818 | 87.818 – 87.818 | 2.9e-06 | 23/25 (2 beyond budget) | 219 | 0.155 |
-| coherent | 5.000 | 4.000 | 4.000 – 4.001 | 1.6e-04 | 23/25 (2 beyond budget) | 219 | 0.726 |
-| even cat | 5.000 | 84.004 | 84.004 – 84.004 | 7.2e-08 | 23/25 (2 beyond budget) | 219 | 0.158 |
-| squeezed cat | 5.000 | 87.813 | 87.813 – 87.813 | 4.4e-06 | 23/25 (2 beyond budget) | 219 | 0.155 |
-| Fock |5⟩ | 5.000 | 44.000 | 44.000 – 44.000 | 5.4e-09 | 23/25 (2 beyond budget) | 219 | 0.219 |
-| optimised Fock superposition | 5.000 | 81.929 | 81.929 – 81.929 | 4.5e-09 | 23/25 (2 beyond budget) | 219 | 0.160 |
-| optimised sqz-vac superposition | 5.004 | 87.821 | 87.815 – 87.821 | 6.2e-05 | 23/25 (2 beyond budget) | 219 | 0.155 |
-| optimised sqz-coh superposition | 5.015 | 88.021 | 88.021 – 88.023 | 2.1e-05 | 23/25 (2 beyond budget) | 219 | 0.155 |
+| squeezed vacuum | 5.000 | 87.818 | 87.818 – 87.818 | 2.9e-06 | 25/25 (2 via pure-state track) | 560 | 0.155 |
+| coherent | 5.000 | 4.000 | 4.000 – 4.001 | 1.6e-04 | 25/25 (2 via pure-state track) | 560 | 0.726 |
+| even cat | 5.000 | 84.004 | 84.004 – 84.004 | 7.2e-08 | 25/25 (2 via pure-state track) | 560 | 0.158 |
+| squeezed cat | 5.000 | 87.813 | 87.813 – 87.813 | 4.4e-06 | 25/25 (2 via pure-state track) | 560 | 0.155 |
+| Fock |5⟩ | 5.000 | 44.000 | 44.000 – 44.000 | 5.4e-09 | 25/25 (2 via pure-state track) | 560 | 0.219 |
+| optimised Fock superposition | 5.000 | 81.929 | 81.929 – 81.929 | 4.5e-09 | 25/25 (2 via pure-state track) | 560 | 0.160 |
+| optimised sqz-vac superposition | 5.004 | 87.821 | 87.815 – 87.821 | 6.2e-05 | 25/25 (2 via pure-state track) | 560 | 0.155 |
+| optimised sqz-coh superposition | 5.015 | 88.021 | 88.021 – 88.023 | 2.1e-05 | 25/25 (2 via pure-state track) | 560 | 0.155 |
 
 ## Photon-number scaling (exact, lossless)
 

@@ -105,6 +105,29 @@ def sweep_frequency(families, n_max, quick):
     return pd.DataFrame(rows)
 
 
+PURE_LADDER = [400, 560, 800, 1120, 1600, 2240, 3200]
+
+
+def fill_pure(df_f):
+    """Where the density-matrix track was beyond its cutoff budget, compute the point
+    with the pure-state Fock track (lossless channel, same Hamiltonian), converged
+    on a ladder of much larger cutoffs."""
+    df_f = df_f.copy()
+    if "track" not in df_f:
+        df_f["track"] = "mesolve"
+    todo = df_f.index[df_f.note.fillna("").str.startswith("skipped")]
+    for i in todo:
+        fam, k = df_f.at[i, "family"], df_f.at[i, "kappa_ba"]
+        t0 = time.time()
+        res = b.converge(lambda N: b.rp_qfi_pure(probe(fam, N, NBAR), kappa_ba=k), cutoffs=PURE_LADDER, rtol=1e-3)
+        exact = df_f.at[i, "qfi_exact"]
+        df_f.loc[i, ["qfi_fock", "cutoff", "converged", "rel_err_fock", "seconds", "track", "note"]] = [
+            res.value, res.cutoff, res.converged, (res.value - exact) / exact, time.time() - t0, "pure",
+            "pure-state Fock track (sesolve), beyond density-matrix cutoff budget"]
+        print(f"   [{fam}] f={df_f.at[i, 'freq_hz']:6.1f} Hz kappa={k:.3f}: pure track {res}  rel {(res.value-exact)/exact:+.1e}  {time.time()-t0:.0f}s", flush=True)
+    return df_f
+
+
 def sweep_nbar(families):
     rows = []
     for fam in families:
@@ -133,7 +156,7 @@ LEGEND = {
     "opt_sqz_vac": "Optimized sqz-vac sup. (no-BA, lossless)",
     "opt_sqz_coh": "Optimized sqz-coh sup. (no-BA, lossless)",
 }
-TITLE_CHANNEL = "backaction → displacement, no loss, no phase noise (⟨n⟩ = 5)"
+TITLE_CHANNEL = "backaction → displacement, ⟨n⟩ = 5"
 
 
 def _kappa_axis(ax):
@@ -179,7 +202,7 @@ def figure_qfi_vs_frequency(df_f, path):
         d = df_f[df_f.family == fam].sort_values("freq_hz")
         ok, skipped = d[d.converged], d[~d.converged]
         line, = ax.plot(ok.freq_hz, ok.qfi_fock, "-o", label=LEGEND[fam])
-        if len(skipped):      # beyond the cutoff budget: exact value, hollow marker
+        if len(skipped):      # still beyond every budget: exact value, hollow marker
             ax.plot(skipped.freq_hz, skipped.qfi_exact, "o", mfc="white", color=line.get_color())
             ax.plot([skipped.freq_hz.max(), ok.freq_hz.min()], [skipped.qfi_exact.iloc[0], ok.qfi_fock.iloc[0]],
                     "-", color=line.get_color(), alpha=0.5)
@@ -190,8 +213,13 @@ def figure_qfi_vs_frequency(df_f, path):
     ax.grid(True, which="both", alpha=0.3)
     _kappa_axis(ax)
     ax.legend(loc="lower right", fontsize=8)
-    ax.text(0.01, 0.55, "filled: Fock track at converged cutoff\nhollow: exact 8 Var(x), beyond cutoff budget",
-            transform=ax.transAxes, fontsize=7, color="0.35", va="center")
+    pure = df_f[df_f.get("track", "mesolve") == "pure"]
+    note = "markers: Fock track at converged cutoff"
+    if len(pure):
+        note += (f"\n(below {pure.freq_hz.max():.0f} Hz: pure-state solve, cutoff up to {int(pure.cutoff.max())})")
+    if (~df_f.converged).any():
+        note += "\nhollow: exact 8 Var(x), not converged"
+    ax.text(0.01, 0.55, note, transform=ax.transAxes, fontsize=7, color="0.35", va="center")
     fig.tight_layout(); fig.savefig(path); plt.close(fig)
     print("figure:", path)
 
@@ -208,7 +236,7 @@ def figure_strain_bound(df_f, path):
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel(r"Frequency  $\Omega/2\pi$  [Hz]")
     ax.set_ylabel(r"Strain bound  $\sigma_h / h_{\rm SQL} = \sqrt{2/(\kappa F)}$")
-    ax.set_title("Strain bound (quantum Cramér–Rao), " + TITLE_CHANNEL.replace(", no phase noise", ""))
+    ax.set_title("Strain bound (quantum Cramér–Rao), " + TITLE_CHANNEL)
     ax.grid(True, which="both", alpha=0.3)
     _kappa_axis(ax)
     ax.legend(loc="upper left", fontsize=7)
@@ -229,7 +257,7 @@ def figure_qfi_vs_nbar(df_n, path):
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel(r"Mean photon number  $\langle n \rangle$")
     ax.set_ylabel(r"Lossless QFI for $\varepsilon_a$  $= 8\,\mathrm{Var}(x)$")
-    ax.set_title("backaction → displacement, no loss: QFI vs photon number (any frequency)")
+    ax.set_title("backaction → displacement: QFI vs photon number")
     ax.grid(True, which="both", alpha=0.3)
     ax.legend(loc="upper left", fontsize=8)
     fig.tight_layout(); fig.savefig(path); plt.close(fig)
@@ -257,9 +285,10 @@ def write_summary(df_f, df_n, path):
         d = df_f[df_f.family == fam]
         ok = d[d.converged]
         i30 = (d.freq_hz - 30).abs().idxmin()
+        npure = int((d.get("track", "mesolve") == "pure").sum())
         lines.append(f"| {LABELS[fam]} | {d.nbar.iloc[0]:.3f} | {d.qfi_exact.iloc[0]:.3f} | "
                      f"{ok.qfi_fock.min():.3f} – {ok.qfi_fock.max():.3f} | {ok.rel_err_fock.abs().max():.1e} | "
-                     f"{len(ok)}/{len(d)} ({int((d.note != '').sum())} beyond budget) | {d.cutoff.max()} | {d.loc[i30, 'sigma_h_over_sql']:.3f} |")
+                     f"{len(ok)}/{len(d)} ({npure} via pure-state track) | {int(d.cutoff.max())} | {d.loc[i30, 'sigma_h_over_sql']:.3f} |")
     lines += ["", "## Photon-number scaling (exact, lossless)", "",
               "| probe | ⟨n⟩ values | F at ⟨n⟩ = 5 | F at largest ⟨n⟩ | local slope at top |", "|---|---|---|---|---|"]
     for fam in [f for f in FAMILIES if f in set(df_n.family)]:
@@ -277,12 +306,16 @@ def main():
     ap.add_argument("--quick", action="store_true", help="every 4th frequency only")
     ap.add_argument("--families", nargs="*", default=FAMILIES)
     ap.add_argument("--figure-only", action="store_true", help="re-render the figure and summary from saved CSVs")
+    ap.add_argument("--fill-pure", action="store_true", help="fill beyond-budget points with the pure-state Fock track, then re-render")
     args = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True); FIG.mkdir(exist_ok=True)
 
-    if args.figure_only:
+    if args.figure_only or args.fill_pure:
         df_f = pd.read_csv(OUT / "qfi_vs_frequency.csv"); df_f["note"] = df_f["note"].fillna("")
         df_n = pd.read_csv(OUT / "qfi_vs_nbar.csv")
+        if args.fill_pure:
+            df_f = fill_pure(df_f)
+            df_f.to_csv(OUT / "qfi_vs_frequency.csv", index=False)
     else:
         df_f = sweep_frequency(args.families, args.n_max, args.quick)
         df_f.to_csv(OUT / "qfi_vs_frequency.csv", index=False)
