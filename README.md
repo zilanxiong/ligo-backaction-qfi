@@ -15,7 +15,7 @@ package.
 | `requirements.txt` | the pip side of the same setup; installs the package above in editable mode |
 | `data/optimised_states/` | the group's previously optimised probes (no back-action), with the orientation note in its README |
 | `scripts/export_for_upstream.py` | assembles `for_upstream/`, this study laid out for the group's repository (see *Uploading to the group's repository*) |
-| `studies/` | the sweeps. `backaction_only.py`: QFI vs frequency with back-action only. `input_loss.py`: input loss (transmission 0.95) + back-action, checked against the paper's numbers. `channel_loss.py`: loss concurrent with the shear, the first frequency-dependent case |
+| `studies/` | the sweeps. `backaction_only.py`: QFI vs frequency with back-action only. `input_loss.py`: input loss (transmission 0.95) + back-action, checked against the paper's numbers. `channel_loss.py`: loss concurrent with the shear, the first frequency-dependent case; `--pn-in 0.2` adds the paper's 200 mrad preparation phase noise |
 | `results/`, `figures/` | outputs of the studies, one folder per study, with a `summary.md` each |
 | `tests/` | smoke tests for the environment, the Fock-cutoff convergence suite, the Gaussian benchmark suite, and the optimised-state loader |
 
@@ -124,3 +124,11 @@ below ~30 Hz (κ ≳ 1). Primary track: the exact shear-frame solver
 (`backaction_qfi.frame`), which keeps the state compact at any κ; cross-checked against
 the package's own density-matrix channel at the low-κ points, and at κ → 0 against the
 paper's stored QFI and the β² closed forms. See `results/channel_loss/summary.md`.
+
+### Phase noise + channel loss + back-action (`studies/channel_loss.py --pn-in 0.2`)
+
+The paper's headline operating point: 200 mrad of input phase noise and 5 % channel loss,
+with the optimised states from that exact slice. At high frequency the paper's ordering is
+reproduced (the three optimised families at 30.4-30.5 against squeezed vacuum at 18.2, the
+2.2 dB non-Gaussian advantage). Below ~30 Hz the ordering changes: the Fock state degrades
+least and is the best probe at 10 Hz. See `results/channel_loss_pn0p2/summary.md`.
