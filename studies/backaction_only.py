@@ -121,7 +121,7 @@ LEGEND = {
     "opt_sqz_vac": "Optimized sqz-vac sup. (no-BA, lossless)",
     "opt_sqz_coh": "Optimized sqz-coh sup. (no-BA, lossless)",
 }
-TITLE_CHANNEL = "backaction → displacement, ⟨n⟩ = 5"
+TITLE_CHANNEL = "backaction + displacement, ⟨n⟩ = 5"
 
 
 def _kappa_axis(ax):

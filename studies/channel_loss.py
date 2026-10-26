@@ -174,7 +174,7 @@ def figure(df, eta, path):
     ax.set_xlabel(r"Frequency  $\Omega/2\pi$  [Hz]"); ax.set_ylabel(r"QFI for $\varepsilon_a$")
     pn = d_eta.pn_in.iloc[0] if "pn_in" in d_eta else 0.0
     head = f"phase noise ({1000 * pn:.0f} mrad) → " if pn > 0 else ""
-    ax.set_title(head + f"backaction + channel loss ($\\eta_{{ch}}$ = {eta:g}) → displacement, ⟨n⟩ = 5", fontsize=11)
+    ax.set_title(head + f"backaction + displacement + channel loss ($\\eta_{{ch}}$ = {eta:g}), ⟨n⟩ = 5", fontsize=11)
     ax.grid(True, which="both", alpha=0.3)
     _kappa_axis(ax)
     ax.legend(loc="lower right", fontsize=8)

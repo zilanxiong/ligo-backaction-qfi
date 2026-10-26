@@ -173,7 +173,7 @@ def figure(df, eta, path):
             ax.plot(bad.freq_hz, bad.qfi_fock, "o", mfc="white", color=line.get_color())
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel(r"Frequency  $\Omega/2\pi$  [Hz]"); ax.set_ylabel(r"QFI for $\varepsilon_a$")
-    ax.set_title(f"input loss ($\\eta_{{in}}$ = {eta:g}) → backaction → displacement, ⟨n⟩ = 5")
+    ax.set_title(f"input loss ($\\eta_{{in}}$ = {eta:g}) → backaction + displacement, ⟨n⟩ = 5")
     ax.grid(True, which="both", alpha=0.3)
     _kappa_axis(ax)
     ax.legend(loc="lower right", fontsize=8)
