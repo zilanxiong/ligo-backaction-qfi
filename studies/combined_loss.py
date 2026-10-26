@@ -1,19 +1,21 @@
-"""Input loss + channel loss (concurrent with the shear) + back-action, nbar = 5, 10 Hz - 1 kHz.
+"""Combinations of input, channel and output loss with back-action, nbar = 5, 10 Hz - 1 kHz.
 
 The paper has no input+channel loss results; what it provides is the state-independent
 identity (supplement Eq. 16) that loss *during* the displacement equals loss *before* it
 with the displacement scaled by beta = 2(1 - sqrt(eta))/|ln eta|.  So at kappa -> 0 this
 channel must reduce, for every probe, to
 
-    F = beta(eta_ch)^2 x F_input-loss(eta_in * eta_ch)
+    F = eta_out x beta(eta_ch)^2 x F_input-loss(eta_in * eta_ch * eta_out)
 
-(two losses before the signal combine into one of product transmission).  For squeezed
+(every loss commutes with the displacement up to a rescaling of the displacement, so all
+of them move in front of the signal and combine into one loss of product transmission,
+while the displacement is scaled by beta(eta_ch) * sqrt(eta_out)).  For squeezed
 vacuum and coherent light that is a closed form (paper Eq. 17); for the others the sweep
 records both the beta-relation value and the direct kappa = 0 value of the package channel.
 The optimised states are the paper's channel-loss states at eta_ch (its only loss slice
 with phase noise); they were not optimised for the extra input loss.
 
-Usage:  python studies/combined_loss.py [--eta-in 0.95] [--pn-in 0.2] [--etas 0.95 ...] [--quick] [--figure-only]
+Usage:  python studies/combined_loss.py [--eta-in 0.95] [--eta-out 0.95] [--pn-in 0.2] [--etas 0.95 ...] [--quick] [--figure-only]
 """
 
 import argparse
@@ -37,7 +39,8 @@ FIG = ROOT / "figures"
 NBAR = 5.0
 ETAS = [0.95]
 PN_IN = 0.0            # set from --pn-in
-ETA_IN = 0.95          # set from --eta-in
+ETA_IN = 0.95          # set from --eta-in (1.0 = off)
+ETA_OUT = 1.0          # set from --eta-out (1.0 = off)
 FREQS_HZ = np.logspace(1, 3, 25)
 N_REF = 400
 FRAME_LADDER = [120, 160, 220, 300, 400]
@@ -92,15 +95,17 @@ def input_loss_qfi(family, eta, eta_pre):
 
 
 def reference(family, eta):
-    """kappa -> 0 value from the paper's beta relation: beta(eta_ch)² × F_input-loss(eta_in eta_ch)."""
-    src = ("closed form: beta² × paper Eq. 17 at eta_in·eta_ch" if (family in ("squeezed", "coherent") and PN_IN == 0.0)
-           else "beta relation (paper Eq. 16) on the package's input-loss value at eta_in·eta_ch")
-    return beta(eta) ** 2 * input_loss_qfi(family, eta, ETA_IN * eta), src
+    """kappa -> 0 value from the paper's beta relation: eta_out × beta(eta_ch)² × F_input-loss(eta_in eta_ch)."""
+    src = ("closed form: eta_out × beta² × paper Eq. 17 at eta_in·eta_ch·eta_out" if (family in ("squeezed", "coherent") and PN_IN == 0.0)
+           else "eta_out × beta relation (paper Eq. 16) on the package's input-loss value at eta_in·eta_ch·eta_out")
+    # every loss commutes with the displacement up to rescaling: all of them move before the
+    # signal (product transmission), the displacement picks up beta(eta_ch) * sqrt(eta_out)
+    return ETA_OUT * beta(eta) ** 2 * input_loss_qfi(family, eta, ETA_IN * eta * ETA_OUT), src
 
 
 def direct_kappa0(family, eta):
     """The package channel itself at kappa = 0 with both losses (what the beta relation predicts)."""
-    return b.rp_qfi(probe(family, 200, eta), kappa_ba=0.0, eta_in=ETA_IN, eta_ch=eta, pn_in=PN_IN)
+    return b.rp_qfi(probe(family, 200, eta), kappa_ba=0.0, eta_in=ETA_IN, eta_ch=eta, eta_out=ETA_OUT, pn_in=PN_IN)
 
 
 def sweep(etas, n_max, quick, checkpoint=None):
@@ -114,14 +119,14 @@ def sweep(etas, n_max, quick, checkpoint=None):
             k0 = direct_kappa0(fam, eta)
             e_used, e_note = opt_slice(fam, eta) if fam.startswith("opt_") else (np.nan, "")
             nbar = b.mean_photon_number(probe(fam, N_REF, eta))
-            print(f"[eta_in={ETA_IN} eta_ch={eta} pn_in={PN_IN}] [{fam}] <n>={nbar:.4f}  kappa->0: beta relation {ref:.4f} vs direct {k0:.4f} "
+            print(f"[eta_in={ETA_IN} eta_ch={eta} eta_out={ETA_OUT} pn_in={PN_IN}] [{fam}] <n>={nbar:.4f}  kappa->0: beta relation {ref:.4f} vs direct {k0:.4f} "
                   f"(rel {(k0 - ref) / ref:+.1e}) ({ref_src}) {e_note}", flush=True)
             for f, k in zip(freqs, kappas):
                 t0 = time.time()
-                gauss = g.gaussian_qfi(GAUSSIAN[fam](NBAR), kappa_ba=k, eta_in=ETA_IN, eta_ch=eta) if (fam in GAUSSIAN and PN_IN == 0.0) else np.nan
+                gauss = g.gaussian_qfi(GAUSSIAN[fam](NBAR), kappa_ba=k, eta_in=ETA_IN, eta_ch=eta, eta_out=ETA_OUT) if (fam in GAUSSIAN and PN_IN == 0.0) else np.nan
                 # primary: the exact shear-frame solver (compact at any kappa); cross-check against
                 # the package's own density-matrix channel where that is cheap (small kappa)
-                res = b.converge(lambda N: b.rp_qfi_unsheared(probe(fam, N, eta), kappa_ba=k, eta_in=ETA_IN, eta_ch=eta, pn_in=PN_IN, N_basis=N),
+                res = b.converge(lambda N: b.rp_qfi_unsheared(probe(fam, N, eta), kappa_ba=k, eta_in=ETA_IN, eta_ch=eta, eta_out=ETA_OUT, pn_in=PN_IN, N_basis=N),
                                  cutoffs=FRAME_LADDER, rtol=1e-3, n_stable=2)
                 track = "frame"
                 predicted = b.suggested_cutoff(NBAR, k, safety=2.0)
@@ -130,10 +135,10 @@ def sweep(etas, n_max, quick, checkpoint=None):
                     rungs = [N for N in ladder if N >= max(40, int(0.6 * predicted))] or [n_max]
                     if len(rungs) < 2:
                         rungs = [rungs[0], n_max] if rungs[0] < n_max else [int(0.75 * n_max), n_max]
-                    chk = b.converge(lambda N: b.rp_qfi(probe(fam, N, eta), kappa_ba=k, eta_in=ETA_IN, eta_ch=eta, pn_in=PN_IN, N_basis=N),
+                    chk = b.converge(lambda N: b.rp_qfi(probe(fam, N, eta), kappa_ba=k, eta_in=ETA_IN, eta_ch=eta, eta_out=ETA_OUT, pn_in=PN_IN, N_basis=N),
                                      cutoffs=rungs, rtol=1e-3)
                     mes = chk.value if chk.converged else np.nan
-                rows.append(dict(eta_in=ETA_IN, eta_ch=eta, pn_in=PN_IN, family=fam, freq_hz=f, kappa_ba=k, nbar=nbar, qfi_fock=res.value,
+                rows.append(dict(eta_in=ETA_IN, eta_ch=eta, eta_out=ETA_OUT, pn_in=PN_IN, family=fam, freq_hz=f, kappa_ba=k, nbar=nbar, qfi_fock=res.value,
                                  cutoff=res.cutoff, converged=res.converged, track=track, qfi_reference=ref, qfi_kappa0_direct=k0,
                                  reference_source=ref_src, ratio_to_reference=res.value / ref,
                                  qfi_gaussian=gauss, qfi_mesolve=mes, opt_eta_used=e_used, note=e_note, seconds=time.time() - t0))
@@ -186,8 +191,11 @@ def figure(df, eta, path):
     ax.set_xlabel(r"Frequency  $\Omega/2\pi$  [Hz]"); ax.set_ylabel(r"QFI for $\varepsilon_a$")
     pn = d_eta.pn_in.iloc[0] if "pn_in" in d_eta else 0.0
     head = f"phase noise ({1000 * pn:.0f} mrad) → " if pn > 0 else ""
-    ein = d_eta.eta_in.iloc[0]
-    ax.set_title(head + f"input loss ($\\eta_{{in}}$ = {ein:g}) → backaction + displacement + channel loss ($\\eta_{{ch}}$ = {eta:g}), ⟨n⟩ = 5", fontsize=10)
+    ein, eout = d_eta.eta_in.iloc[0], d_eta.eta_out.iloc[0]
+    title = head + (f"input loss ($\\eta_{{in}}$ = {ein:g}) → " if ein < 1 else "")
+    title += f"backaction + displacement + channel loss ($\\eta_{{ch}}$ = {eta:g})"
+    title += (f" → output loss ($\\eta_{{out}}$ = {eout:g})" if eout < 1 else "") + ", ⟨n⟩ = 5"
+    ax.set_title(title, fontsize=10)
     ax.grid(True, which="both", alpha=0.3)
     _kappa_axis(ax)
     ax.legend(loc="lower right", fontsize=8)
@@ -196,16 +204,17 @@ def figure(df, eta, path):
 
 
 def write_summary(df, path):
-    lines = ["# Input loss + channel loss (concurrent with the shear) + back-action, ⟨n⟩ = 5, 10 Hz – 1 kHz", "",
-             "The paper has no input+channel loss results; the check is its state-independent β relation",
-             "(supplement Eq. 16): at κ → 0, F = β(η_ch)² × F_input-loss(η_in·η_ch). Closed form (Eq. 17) for",
+    lines = ["# Loss combinations with back-action, ⟨n⟩ = 5, 10 Hz – 1 kHz", "",
+             "The paper has no multi-placement loss results; the check is its state-independent β relation",
+             "(supplement Eq. 16) plus the exact η_out scaling of loss after the signal: at κ → 0,",
+             "F = η_out × β(η_ch)² × F_input-loss(η_in·η_ch·η_out). Closed form (Eq. 17) for",
              "squeezed vacuum and coherent light; for the rest the β relation applied to the package's own",
              "input-loss value, next to the package channel evaluated directly at κ = 0 with both losses.", ""]
     for eta in sorted(df.eta_ch.unique()):
         d_eta = df[df.eta_ch == eta]
         pn = d_eta.pn_in.iloc[0] if "pn_in" in d_eta else 0.0
-        ein = d_eta.eta_in.iloc[0]
-        lines += [f"## η_in = {ein:g}, η_ch = {eta:g}" + (f", input phase noise {1000 * pn:.0f} mrad" if pn > 0 else ""), "",
+        ein, eout = d_eta.eta_in.iloc[0], d_eta.eta_out.iloc[0]
+        lines += [f"## η_in = {ein:g}, η_ch = {eta:g}, η_out = {eout:g}" + (f", input phase noise {1000 * pn:.0f} mrad" if pn > 0 else ""), "",
                   "| probe | κ→0 by β relation | source | direct κ=0 (package) | rel. diff | F at 1 kHz | F at 30 Hz (κ≈1) | F at 10 Hz (κ≈9.5) | 10 Hz / 1 kHz | converged | cross-check (points, worst rel.) | largest cutoff |",
                   "|---|---|---|---|---|---|---|---|---|---|---|---|"]
         for fam in [f for f in FAMILIES if f in set(d_eta.family)]:
@@ -233,11 +242,13 @@ def main():
     ap.add_argument("--quick", action="store_true")
     ap.add_argument("--figure-only", action="store_true")
     ap.add_argument("--pn-in", type=float, default=0.0, help="input phase noise rms [rad]")
-    ap.add_argument("--eta-in", type=float, default=0.95, help="input-loss transmission")
+    ap.add_argument("--eta-in", type=float, default=0.95, help="input-loss transmission (1 = off)")
+    ap.add_argument("--eta-out", type=float, default=1.0, help="output-loss transmission (1 = off)")
     args = ap.parse_args()
-    global PN_IN, OUT, ETA_IN
-    PN_IN, ETA_IN = args.pn_in, args.eta_in
-    tag = f"_in{ETA_IN:g}".replace(".", "p") + (f"_pn{PN_IN:g}".replace(".", "p") if PN_IN > 0 else "")
+    global PN_IN, OUT, ETA_IN, ETA_OUT
+    PN_IN, ETA_IN, ETA_OUT = args.pn_in, args.eta_in, args.eta_out
+    tag = ((f"_in{ETA_IN:g}" if ETA_IN < 1 else "") + (f"_out{ETA_OUT:g}" if ETA_OUT < 1 else "")
+           + (f"_pn{PN_IN:g}" if PN_IN > 0 else "")).replace(".", "p")
     OUT = ROOT / "results" / ("combined_loss" + tag)
     OUT.mkdir(parents=True, exist_ok=True); FIG.mkdir(exist_ok=True)
     csv = OUT / "qfi_vs_frequency.csv"

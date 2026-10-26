@@ -15,7 +15,7 @@ package.
 | `requirements.txt` | the pip side of the same setup; installs the package above in editable mode |
 | `data/optimised_states/` | the group's previously optimised probes (no back-action), with the orientation note in its README |
 | `scripts/export_for_upstream.py` | assembles `for_upstream/`, this study laid out for the group's repository (see *Uploading to the group's repository*) |
-| `studies/` | the sweeps. `backaction_only.py`: QFI vs frequency with back-action only. `input_loss.py`: input loss (transmission 0.95) + back-action, checked against the paper's numbers. `channel_loss.py`: loss concurrent with the shear, the first frequency-dependent case; `--pn-in 0.2` adds the paper's 200 mrad preparation phase noise. `output_loss.py`: loss after the shear, the placement behind frequency-dependent squeezing. `combined_loss.py`: input loss and channel loss together, checked against the paper's β relation |
+| `studies/` | the sweeps. `backaction_only.py`: QFI vs frequency with back-action only. `input_loss.py`: input loss (transmission 0.95) + back-action, checked against the paper's numbers. `channel_loss.py`: loss concurrent with the shear, the first frequency-dependent case; `--pn-in 0.2` adds the paper's 200 mrad preparation phase noise. `output_loss.py`: loss after the shear, the placement behind frequency-dependent squeezing. `combined_loss.py`: any combination of input, channel and output loss (`--eta-in`, `--eta-out`, `--pn-in`), checked against the paper's β relation |
 | `results/`, `figures/` | outputs of the studies, one folder per study, with a `summary.md` each |
 | `tests/` | smoke tests for the environment, the Fock-cutoff convergence suite, the Gaussian benchmark suite, and the optimised-state loader |
 
@@ -142,10 +142,11 @@ vacuum at the optimal angle per frequency), which still beats every fixed probe 
 The paper has no `loss_out` optimisation for the squeezed-coherent family, so that probe
 uses its channel-loss state (marked). See `results/output_loss/summary.md`.
 
-### Input loss + channel loss + back-action (`studies/combined_loss.py`)
+### Loss combinations + back-action (`studies/combined_loss.py`)
 
-5 % input loss and 5 % channel loss. The paper has no such combination, but its
-state-independent identity (supplement Eq. 16, loss during the displacement = loss before it
-with the displacement scaled by β) predicts the κ → 0 value for every probe from the
-input-loss value at η_in·η_ch; the package channel reproduces it to 1e-7 for all eight,
-Gaussian and non-Gaussian alike. See `results/combined_loss_in0p95/summary.md`.
+Run so far: input 0.95 + channel 0.95 (`results/combined_loss_in0p95/`) and channel 0.95 +
+output 0.95 (`results/combined_loss_out0p95/`). The paper has no multi-placement results, but
+every loss commutes with the displacement up to a rescaling, so at κ → 0 the QFI must equal
+η_out·β(η_ch)² × the input-loss value at the product transmission η_in·η_ch·η_out (paper
+supplement Eq. 16 and 17). The package channel reproduces this to 1e-7 for all eight probes,
+Gaussian and non-Gaussian alike.
