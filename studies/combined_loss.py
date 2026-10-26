@@ -55,32 +55,47 @@ GAUSSIAN = {"squeezed": lambda n: g.squeezed_at_fixed_nbar(n), "coherent": lambd
 SLICE = "loss_ch"
 
 
-def _available_etas(state_type):
+def _available_etas(state_type, config):
     df = pd.read_csv(opt.DATA_DIR / "master_results.csv", dtype={"valid": str})
     df = df[(df.valid.fillna("").str.lower() != "false") & (df.state_type == state_type)
-            & (df.loss_config == SLICE) & (df.pn == PN_IN) & (df.N_target == NBAR)]
+            & (df.loss_config == config) & (df.pn == PN_IN) & (df.N_target == NBAR)]
     return sorted(df.eta.unique())
 
 
+def _slice_for(eta):
+    """Which of the paper's loss slices to draw the optimised states from."""
+    if eta < 1.0:
+        return "loss_ch", eta
+    if ETA_IN < 1.0:
+        return "loss_in", ETA_IN
+    if ETA_OUT < 1.0:
+        return "loss_out", ETA_OUT
+    return "loss_ch", 1.0
+
+
 def opt_slice(family, eta):
-    avail = _available_etas(family[4:])
-    if eta in avail:
-        return eta, ""
-    near = min(avail, key=lambda e: abs(e - eta))
-    return near, f"no {SLICE} entry at eta={eta}, pn={PN_IN}; nearest slice eta={near} used"
+    config, e_want = _slice_for(eta)
+    avail = _available_etas(family[4:], config)
+    if not avail and config == "loss_out":          # sqz_coh has no loss_out optimisations
+        config, avail = "loss_ch", _available_etas(family[4:], "loss_ch")
+    if e_want in avail:
+        return e_want, ("" if config == "loss_ch" and eta < 1.0 else f"{config} state at eta={e_want} used")
+    near = min(avail, key=lambda e: abs(e - e_want))
+    return near, f"no {config} entry at eta={e_want}, pn={PN_IN}; nearest {config} slice eta={near} used"
 
 
 def probe(family, N, eta):
     if family.startswith("opt_"):
-        e, _ = opt_slice(family, eta)
-        psi, _ = opt.load_probe(family[4:], SLICE, e, PN_IN, NBAR, N_basis=N)
+        e, note = opt_slice(family, eta)
+        config = note.split(" state")[0] if note and " state at" in note else (note.split("nearest ")[1].split(" slice")[0] if "nearest" in note else "loss_ch")
+        psi, _ = opt.load_probe(family[4:], config, e, PN_IN, NBAR, N_basis=N)
         return psi
     return b.make_probe(family, N, NBAR)
 
 
 def beta(eta):
     """Loss during a displacement = loss, then the displacement scaled by beta (paper Eq. 16)."""
-    return 2 * (1 - np.sqrt(eta)) / abs(np.log(eta))
+    return 1.0 if eta >= 1.0 else 2 * (1 - np.sqrt(eta)) / abs(np.log(eta))
 
 
 def input_loss_qfi(family, eta, eta_pre):
@@ -193,7 +208,7 @@ def figure(df, eta, path):
     head = f"phase noise ({1000 * pn:.0f} mrad) → " if pn > 0 else ""
     ein, eout = d_eta.eta_in.iloc[0], d_eta.eta_out.iloc[0]
     title = head + (f"input loss ($\\eta_{{in}}$ = {ein:g}) → " if ein < 1 else "")
-    title += f"backaction + displacement + channel loss ($\\eta_{{ch}}$ = {eta:g})"
+    title += "backaction + displacement" + (f" + channel loss ($\\eta_{{ch}}$ = {eta:g})" if eta < 1 else "")
     title += (f" → output loss ($\\eta_{{out}}$ = {eout:g})" if eout < 1 else "") + ", ⟨n⟩ = 5"
     ax.set_title(title, fontsize=10)
     ax.grid(True, which="both", alpha=0.3)
@@ -260,7 +275,7 @@ def main():
         (OUT / "checkpoint.csv").unlink(missing_ok=True)
     write_summary(df, OUT / "summary.md")
     for eta in sorted(df.eta_ch.unique()):
-        figure(df, eta, FIG / (f"combined_loss_ch{eta:g}".replace(".", "p") + tag + ".png"))
+        figure(df, eta, FIG / (("combined_loss" + (f"_ch{eta:g}" if eta < 1 else "")).replace(".", "p") + tag + ".png"))
 
 
 if __name__ == "__main__":

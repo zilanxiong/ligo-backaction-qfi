@@ -1,0 +1,210 @@
+[eta_in=0.95 eta_ch=1.0 eta_out=0.95 pn_in=0.0] [squeezed] <n>=5.0000  kappa->0: beta relation 27.4155 vs direct 27.4155 (rel -5.5e-08) (closed form: eta_out × beta² × paper Eq. 17 at eta_in·eta_ch·eta_out) 
+   f=   10.0 Hz kappa=  9.5299  F=   0.8140 @N=220  [frame] (ref 27.4155, ratio 0.0297)  44s
+   f=   12.1 Hz kappa=  6.4911  F=   1.6964 @N=220  [frame] (ref 27.4155, ratio 0.0619)  24s
+   f=   14.7 Hz kappa=  4.4209  F=   3.4131 @N=220  [frame] (ref 27.4155, ratio 0.1245)  14s
+   f=   17.8 Hz kappa=  3.0104  F=   6.4342 @N=220  [frame] (ref 27.4155, ratio 0.2347)  6s
+   f=   21.5 Hz kappa=  2.0495  F=  10.9165 @N=220  [frame] (ref 27.4155, ratio 0.3982)  15s
+   f=   26.1 Hz kappa=  1.3948  F=  16.1266 @N=220  [frame] (ref 27.4155, ratio 0.5882)  10s
+   f=   31.6 Hz kappa=  0.9488  F=  20.7081 @N=220  [frame] (ref 27.4155, ratio 0.7553)  mesolve 20.6669 (-2.0e-03)  8s
+   f=   38.3 Hz kappa=  0.6449  F=  23.8467 @N=220  [frame] (ref 27.4155, ratio 0.8698)  mesolve 23.8404 (-2.7e-04)  6s
+   f=   46.4 Hz kappa=  0.4379  F=  25.6460 @N=220  [frame] (ref 27.4155, ratio 0.9355)  mesolve 25.6437 (-8.7e-05)  4s
+   f=   56.2 Hz kappa=  0.2969  F=  26.5728 @N=220  [frame] (ref 27.4155, ratio 0.9693)  mesolve 26.5714 (-5.0e-05)  3s
+   f=   68.1 Hz kappa=  0.2008  F=  27.0234 @N=220  [frame] (ref 27.4155, ratio 0.9857)  mesolve 27.0221 (-4.8e-05)  3s
+   f=   82.5 Hz kappa=  0.1354  F=  27.2358 @N=220  [frame] (ref 27.4155, ratio 0.9934)  mesolve 27.2346 (-4.7e-05)  3s
+   f=  100.0 Hz kappa=  0.0909  F=  27.3343 @N=220  [frame] (ref 27.4155, ratio 0.9970)  mesolve 27.3330 (-4.6e-05)  2s
+   f=  121.2 Hz kappa=  0.0606  F=  27.3793 @N=220  [frame] (ref 27.4155, ratio 0.9987)  mesolve 27.3781 (-4.5e-05)  2s
+   f=  146.8 Hz kappa=  0.0400  F=  27.3997 @N=220  [frame] (ref 27.4155, ratio 0.9994)  mesolve 27.3985 (-4.5e-05)  2s
+   f=  177.8 Hz kappa=  0.0261  F=  27.4088 @N=220  [frame] (ref 27.4155, ratio 0.9998)  mesolve 27.4076 (-4.4e-05)  3s
+   f=  215.4 Hz kappa=  0.0167  F=  27.4127 @N=220  [frame] (ref 27.4155, ratio 0.9999)  mesolve 27.4115 (-4.4e-05)  2s
+   f=  261.0 Hz kappa=  0.0105  F=  27.4144 @N=220  [frame] (ref 27.4155, ratio 1.0000)  mesolve 27.4132 (-4.4e-05)  2s
+   f=  316.2 Hz kappa=  0.0064  F=  27.4151 @N=220  [frame] (ref 27.4155, ratio 1.0000)  mesolve 27.4139 (-4.4e-05)  2s
+   f=  383.1 Hz kappa=  0.0038  F=  27.4153 @N=220  [frame] (ref 27.4155, ratio 1.0000)  mesolve 27.4141 (-4.4e-05)  2s
+   f=  464.2 Hz kappa=  0.0021  F=  27.4154 @N=220  [frame] (ref 27.4155, ratio 1.0000)  mesolve 27.4142 (-4.4e-05)  2s
+   f=  562.3 Hz kappa=  0.0012  F=  27.4155 @N=220  [frame] (ref 27.4155, ratio 1.0000)  mesolve 27.4143 (-4.4e-05)  2s
+   f=  681.3 Hz kappa=  0.0006  F=  27.4155 @N=220  [frame] (ref 27.4155, ratio 1.0000)  mesolve 27.4143 (-4.4e-05)  2s
+   f=  825.4 Hz kappa=  0.0003  F=  27.4155 @N=220  [frame] (ref 27.4155, ratio 1.0000)  mesolve 27.4143 (-4.4e-05)  2s
+   f= 1000.0 Hz kappa=  0.0002  F=  27.4155 @N=220  [frame] (ref 27.4155, ratio 1.0000)  mesolve 27.4143 (-4.4e-05)  2s
+[eta_in=0.95 eta_ch=1.0 eta_out=0.95 pn_in=0.0] [coherent] <n>=5.0000  kappa->0: beta relation 3.8000 vs direct 3.8000 (rel -1.4e-09) (closed form: eta_out × beta² × paper Eq. 17 at eta_in·eta_ch·eta_out) 
+   f=   10.0 Hz kappa=  9.5299  F=   0.7151 @N=220  [frame] (ref 3.8000, ratio 0.1882)  61s
+   f=   12.1 Hz kappa=  6.4911  F=   1.2661 @N=220  [frame] (ref 3.8000, ratio 0.3332)  17s
+   f=   14.7 Hz kappa=  4.4209  F=   1.9706 @N=220  [frame] (ref 3.8000, ratio 0.5186)  3s
+   f=   17.8 Hz kappa=  3.0104  F=   2.6565 @N=220  [frame] (ref 3.8000, ratio 0.6991)  1s
+   f=   21.5 Hz kappa=  2.0495  F=   3.1679 @N=220  [frame] (ref 3.8000, ratio 0.8337)  mesolve 3.1679 (-6.2e-06)  5s
+   f=   26.1 Hz kappa=  1.3948  F=   3.4786 @N=220  [frame] (ref 3.8000, ratio 0.9154)  mesolve 3.4786 (-1.3e-07)  2s
+   f=   31.6 Hz kappa=  0.9488  F=   3.6442 @N=220  [frame] (ref 3.8000, ratio 0.9590)  mesolve 3.6442 (-9.1e-10)  1s
+   f=   38.3 Hz kappa=  0.6449  F=   3.7264 @N=220  [frame] (ref 3.8000, ratio 0.9806)  mesolve 3.7264 (-1.2e-09)  1s
+   f=   46.4 Hz kappa=  0.4379  F=   3.7657 @N=220  [frame] (ref 3.8000, ratio 0.9910)  mesolve 3.7657 (-4.8e-11)  1s
+   f=   56.2 Hz kappa=  0.2969  F=   3.7842 @N=220  [frame] (ref 3.8000, ratio 0.9958)  mesolve 3.7842 (+1.9e-10)  1s
+   f=   68.1 Hz kappa=  0.2008  F=   3.7927 @N=220  [frame] (ref 3.8000, ratio 0.9981)  mesolve 3.7927 (-5.5e-11)  1s
+   f=   82.5 Hz kappa=  0.1354  F=   3.7967 @N=220  [frame] (ref 3.8000, ratio 0.9991)  mesolve 3.7967 (-2.1e-11)  1s
+   f=  100.0 Hz kappa=  0.0909  F=   3.7985 @N=220  [frame] (ref 3.8000, ratio 0.9996)  mesolve 3.7985 (+1.3e-10)  1s
+   f=  121.2 Hz kappa=  0.0606  F=   3.7993 @N=220  [frame] (ref 3.8000, ratio 0.9998)  mesolve 3.7993 (-1.2e-10)  1s
+   f=  146.8 Hz kappa=  0.0400  F=   3.7997 @N=220  [frame] (ref 3.8000, ratio 0.9999)  mesolve 3.7997 (-3.3e-10)  1s
+   f=  177.8 Hz kappa=  0.0261  F=   3.7999 @N=220  [frame] (ref 3.8000, ratio 1.0000)  mesolve 3.7999 (-4.4e-10)  1s
+   f=  215.4 Hz kappa=  0.0167  F=   3.7999 @N=220  [frame] (ref 3.8000, ratio 1.0000)  mesolve 3.7999 (-5.5e-10)  1s
+   f=  261.0 Hz kappa=  0.0105  F=   3.8000 @N=220  [frame] (ref 3.8000, ratio 1.0000)  mesolve 3.8000 (-6.6e-10)  1s
+   f=  316.2 Hz kappa=  0.0064  F=   3.8000 @N=220  [frame] (ref 3.8000, ratio 1.0000)  mesolve 3.8000 (-7.5e-10)  1s
+   f=  383.1 Hz kappa=  0.0038  F=   3.8000 @N=220  [frame] (ref 3.8000, ratio 1.0000)  mesolve 3.8000 (-3.1e-10)  1s
+   f=  464.2 Hz kappa=  0.0021  F=   3.8000 @N=220  [frame] (ref 3.8000, ratio 1.0000)  mesolve 3.8000 (-1.7e-10)  1s
+   f=  562.3 Hz kappa=  0.0012  F=   3.8000 @N=220  [frame] (ref 3.8000, ratio 1.0000)  mesolve 3.8000 (+4.5e-10)  1s
+   f=  681.3 Hz kappa=  0.0006  F=   3.8000 @N=220  [frame] (ref 3.8000, ratio 1.0000)  mesolve 3.8000 (+1.3e-10)  1s
+   f=  825.4 Hz kappa=  0.0003  F=   3.8000 @N=220  [frame] (ref 3.8000, ratio 1.0000)  mesolve 3.8000 (-5.0e-10)  1s
+   f= 1000.0 Hz kappa=  0.0002  F=   3.8000 @N=220  [frame] (ref 3.8000, ratio 1.0000)  mesolve 3.8000 (-1.8e-09)  1s
+[eta_in=0.95 eta_ch=1.0 eta_out=0.95 pn_in=0.0] [cat] <n>=5.0000  kappa->0: beta relation 13.5600 vs direct 13.5600 (rel +5.8e-09) (eta_out × beta relation (paper Eq. 16) on the package's input-loss value at eta_in·eta_ch·eta_out) 
+   f=   10.0 Hz kappa=  9.5299  F=   0.7152 @N=220  [frame] (ref 13.5600, ratio 0.0527)  63s
+   f=   12.1 Hz kappa=  6.4911  F=   1.2670 @N=220  [frame] (ref 13.5600, ratio 0.0934)  19s
+   f=   14.7 Hz kappa=  4.4209  F=   1.9793 @N=220  [frame] (ref 13.5600, ratio 0.1460)  6s
+   f=   17.8 Hz kappa=  3.0104  F=   2.7413 @N=220  [frame] (ref 13.5600, ratio 0.2022)  3s
+   f=   21.5 Hz kappa=  2.0495  F=   3.7141 @N=220  [frame] (ref 13.5600, ratio 0.2739)  mesolve 3.7141 (+1.6e-05)  7s
+   f=   26.1 Hz kappa=  1.3948  F=   5.4969 @N=220  [frame] (ref 13.5600, ratio 0.4054)  mesolve 5.4969 (+4.0e-07)  3s
+   f=   31.6 Hz kappa=  0.9488  F=   8.0682 @N=220  [frame] (ref 13.5600, ratio 0.5950)  mesolve 8.0682 (+2.6e-08)  2s
+   f=   38.3 Hz kappa=  0.6449  F=  10.4059 @N=220  [frame] (ref 13.5600, ratio 0.7674)  mesolve 10.4059 (-4.2e-09)  2s
+   f=   46.4 Hz kappa=  0.4379  F=  11.9364 @N=220  [frame] (ref 13.5600, ratio 0.8803)  mesolve 11.9364 (-4.5e-09)  2s
+   f=   56.2 Hz kappa=  0.2969  F=  12.7731 @N=220  [frame] (ref 13.5600, ratio 0.9420)  mesolve 12.7731 (-4.7e-09)  2s
+   f=   68.1 Hz kappa=  0.2008  F=  13.1908 @N=220  [frame] (ref 13.5600, ratio 0.9728)  mesolve 13.1908 (-4.8e-09)  2s
+   f=   82.5 Hz kappa=  0.1354  F=  13.3902 @N=220  [frame] (ref 13.5600, ratio 0.9875)  mesolve 13.3902 (-5.0e-09)  2s
+   f=  100.0 Hz kappa=  0.0909  F=  13.4831 @N=220  [frame] (ref 13.5600, ratio 0.9943)  mesolve 13.4831 (-5.0e-09)  2s
+   f=  121.2 Hz kappa=  0.0606  F=  13.5257 @N=220  [frame] (ref 13.5600, ratio 0.9975)  mesolve 13.5257 (-5.0e-09)  2s
+   f=  146.8 Hz kappa=  0.0400  F=  13.5450 @N=220  [frame] (ref 13.5600, ratio 0.9989)  mesolve 13.5450 (-5.0e-09)  2s
+   f=  177.8 Hz kappa=  0.0261  F=  13.5536 @N=220  [frame] (ref 13.5600, ratio 0.9995)  mesolve 13.5536 (-5.8e-09)  2s
+   f=  215.4 Hz kappa=  0.0167  F=  13.5574 @N=220  [frame] (ref 13.5600, ratio 0.9998)  mesolve 13.5574 (-5.2e-09)  2s
+   f=  261.0 Hz kappa=  0.0105  F=  13.5589 @N=220  [frame] (ref 13.5600, ratio 0.9999)  mesolve 13.5589 (-5.3e-09)  2s
+   f=  316.2 Hz kappa=  0.0064  F=  13.5596 @N=220  [frame] (ref 13.5600, ratio 1.0000)  mesolve 13.5596 (-5.0e-09)  2s
+   f=  383.1 Hz kappa=  0.0038  F=  13.5598 @N=220  [frame] (ref 13.5600, ratio 1.0000)  mesolve 13.5598 (-4.9e-09)  2s
+   f=  464.2 Hz kappa=  0.0021  F=  13.5599 @N=220  [frame] (ref 13.5600, ratio 1.0000)  mesolve 13.5599 (-4.4e-09)  2s
+   f=  562.3 Hz kappa=  0.0012  F=  13.5600 @N=220  [frame] (ref 13.5600, ratio 1.0000)  mesolve 13.5600 (-4.7e-09)  2s
+   f=  681.3 Hz kappa=  0.0006  F=  13.5600 @N=220  [frame] (ref 13.5600, ratio 1.0000)  mesolve 13.5600 (-4.7e-09)  2s
+   f=  825.4 Hz kappa=  0.0003  F=  13.5600 @N=220  [frame] (ref 13.5600, ratio 1.0000)  mesolve 13.5600 (-6.0e-08)  2s
+   f= 1000.0 Hz kappa=  0.0002  F=  13.5600 @N=220  [frame] (ref 13.5600, ratio 1.0000)  mesolve 13.5600 (-1.1e-07)  2s
+[eta_in=0.95 eta_ch=1.0 eta_out=0.95 pn_in=0.0] [squeezed_cat] <n>=5.0000  kappa->0: beta relation 27.3332 vs direct 27.3332 (rel +4.6e-11) (eta_out × beta relation (paper Eq. 16) on the package's input-loss value at eta_in·eta_ch·eta_out) 
+   f=   10.0 Hz kappa=  9.5299  F=   0.8139 @N=300  [frame] (ref 27.3332, ratio 0.0298)  115s
+   f=   12.1 Hz kappa=  6.4911  F=   1.6957 @N=220  [frame] (ref 27.3332, ratio 0.0620)  31s
+   f=   14.7 Hz kappa=  4.4209  F=   3.4104 @N=220  [frame] (ref 27.3332, ratio 0.1248)  12s
+   f=   17.8 Hz kappa=  3.0104  F=   6.4252 @N=220  [frame] (ref 27.3332, ratio 0.2351)  6s
+   f=   21.5 Hz kappa=  2.0495  F=  10.8940 @N=220  [frame] (ref 27.3332, ratio 0.3986)  14s
+   f=   26.1 Hz kappa=  1.3948  F=  16.0851 @N=220  [frame] (ref 27.3332, ratio 0.5885)  10s
+   f=   31.6 Hz kappa=  0.9488  F=  20.6493 @N=220  [frame] (ref 27.3332, ratio 0.7555)  mesolve 20.6374 (-5.7e-04)  7s
+   f=   38.3 Hz kappa=  0.6449  F=  23.7765 @N=220  [frame] (ref 27.3332, ratio 0.8699)  mesolve 23.7748 (-7.2e-05)  4s
+   f=   46.4 Hz kappa=  0.4379  F=  25.5695 @N=220  [frame] (ref 27.3332, ratio 0.9355)  mesolve 25.5693 (-6.6e-06)  4s
+   f=   56.2 Hz kappa=  0.2969  F=  26.4932 @N=220  [frame] (ref 27.3332, ratio 0.9693)  mesolve 26.4932 (-2.3e-06)  3s
+   f=   68.1 Hz kappa=  0.2008  F=  26.9423 @N=220  [frame] (ref 27.3332, ratio 0.9857)  mesolve 26.9423 (-2.0e-06)  4s
+   f=   82.5 Hz kappa=  0.1354  F=  27.1541 @N=220  [frame] (ref 27.3332, ratio 0.9934)  mesolve 27.1541 (-1.9e-06)  3s
+   f=  100.0 Hz kappa=  0.0909  F=  27.2523 @N=220  [frame] (ref 27.3332, ratio 0.9970)  mesolve 27.2522 (-1.9e-06)  3s
+   f=  121.2 Hz kappa=  0.0606  F=  27.2972 @N=220  [frame] (ref 27.3332, ratio 0.9987)  mesolve 27.2971 (-1.8e-06)  3s
+   f=  146.8 Hz kappa=  0.0400  F=  27.3175 @N=220  [frame] (ref 27.3332, ratio 0.9994)  mesolve 27.3174 (-1.8e-06)  3s
+   f=  177.8 Hz kappa=  0.0261  F=  27.3265 @N=220  [frame] (ref 27.3332, ratio 0.9998)  mesolve 27.3265 (-1.8e-06)  3s
+   f=  215.4 Hz kappa=  0.0167  F=  27.3304 @N=220  [frame] (ref 27.3332, ratio 0.9999)  mesolve 27.3304 (-1.7e-06)  3s
+   f=  261.0 Hz kappa=  0.0105  F=  27.3321 @N=220  [frame] (ref 27.3332, ratio 1.0000)  mesolve 27.3321 (-1.7e-06)  3s
+   f=  316.2 Hz kappa=  0.0064  F=  27.3328 @N=220  [frame] (ref 27.3332, ratio 1.0000)  mesolve 27.3327 (-1.7e-06)  3s
+   f=  383.1 Hz kappa=  0.0038  F=  27.3331 @N=220  [frame] (ref 27.3332, ratio 1.0000)  mesolve 27.3330 (-1.7e-06)  3s
+   f=  464.2 Hz kappa=  0.0021  F=  27.3331 @N=220  [frame] (ref 27.3332, ratio 1.0000)  mesolve 27.3331 (-1.7e-06)  3s
+   f=  562.3 Hz kappa=  0.0012  F=  27.3332 @N=220  [frame] (ref 27.3332, ratio 1.0000)  mesolve 27.3331 (-1.7e-06)  3s
+   f=  681.3 Hz kappa=  0.0006  F=  27.3332 @N=220  [frame] (ref 27.3332, ratio 1.0000)  mesolve 27.3331 (-1.7e-06)  3s
+   f=  825.4 Hz kappa=  0.0003  F=  27.3332 @N=220  [frame] (ref 27.3332, ratio 1.0000)  mesolve 27.3331 (-1.7e-06)  3s
+   f= 1000.0 Hz kappa=  0.0002  F=  27.3332 @N=220  [frame] (ref 27.3332, ratio 1.0000)  mesolve 27.3331 (-1.7e-06)  2s
+[eta_in=0.95 eta_ch=1.0 eta_out=0.95 pn_in=0.0] [fock] <n>=5.0000  kappa->0: beta relation 18.3195 vs direct 18.3195 (rel +1.0e-09) (eta_out × beta relation (paper Eq. 16) on the package's input-loss value at eta_in·eta_ch·eta_out) 
+   f=   10.0 Hz kappa=  9.5299  F=   0.7512 @N=220  [frame] (ref 18.3195, ratio 0.0410)  38s
+   f=   12.1 Hz kappa=  6.4911  F=   1.6293 @N=220  [frame] (ref 18.3195, ratio 0.0889)  11s
+   f=   14.7 Hz kappa=  4.4209  F=   3.1502 @N=220  [frame] (ref 18.3195, ratio 0.1720)  3s
+   f=   17.8 Hz kappa=  3.0104  F=   5.5245 @N=220  [frame] (ref 18.3195, ratio 0.3016)  2s
+   f=   21.5 Hz kappa=  2.0495  F=   8.7032 @N=220  [frame] (ref 18.3195, ratio 0.4751)  mesolve 8.7032 (-2.0e-09)  3s
+   f=   26.1 Hz kappa=  1.3948  F=  12.0565 @N=220  [frame] (ref 18.3195, ratio 0.6581)  mesolve 12.0565 (+1.9e-07)  1s
+   f=   31.6 Hz kappa=  0.9488  F=  14.7582 @N=220  [frame] (ref 18.3195, ratio 0.8056)  mesolve 14.7582 (-1.5e-09)  1s
+   f=   38.3 Hz kappa=  0.6449  F=  16.4823 @N=220  [frame] (ref 18.3195, ratio 0.8997)  mesolve 16.4823 (-5.1e-10)  1s
+   f=   46.4 Hz kappa=  0.4379  F=  17.4248 @N=220  [frame] (ref 18.3195, ratio 0.9512)  mesolve 17.4248 (+4.9e-10)  1s
+   f=   56.2 Hz kappa=  0.2969  F=  17.8974 @N=220  [frame] (ref 18.3195, ratio 0.9770)  mesolve 17.8974 (+4.5e-10)  1s
+   f=   68.1 Hz kappa=  0.2008  F=  18.1240 @N=220  [frame] (ref 18.3195, ratio 0.9893)  mesolve 18.1240 (+2.2e-10)  1s
+   f=   82.5 Hz kappa=  0.1354  F=  18.2301 @N=220  [frame] (ref 18.3195, ratio 0.9951)  mesolve 18.2301 (+1.6e-10)  1s
+   f=  100.0 Hz kappa=  0.0909  F=  18.2791 @N=220  [frame] (ref 18.3195, ratio 0.9978)  mesolve 18.2791 (+1.5e-10)  1s
+   f=  121.2 Hz kappa=  0.0606  F=  18.3015 @N=220  [frame] (ref 18.3195, ratio 0.9990)  mesolve 18.3015 (+1.6e-10)  1s
+   f=  146.8 Hz kappa=  0.0400  F=  18.3117 @N=220  [frame] (ref 18.3195, ratio 0.9996)  mesolve 18.3117 (+6.2e-10)  1s
+   f=  177.8 Hz kappa=  0.0261  F=  18.3162 @N=220  [frame] (ref 18.3195, ratio 0.9998)  mesolve 18.3162 (+8.5e-10)  1s
+   f=  215.4 Hz kappa=  0.0167  F=  18.3181 @N=220  [frame] (ref 18.3195, ratio 0.9999)  mesolve 18.3181 (+1.2e-09)  1s
+   f=  261.0 Hz kappa=  0.0105  F=  18.3190 @N=220  [frame] (ref 18.3195, ratio 1.0000)  mesolve 18.3190 (+1.3e-09)  1s
+   f=  316.2 Hz kappa=  0.0064  F=  18.3193 @N=220  [frame] (ref 18.3195, ratio 1.0000)  mesolve 18.3193 (+3.9e-10)  1s
+   f=  383.1 Hz kappa=  0.0038  F=  18.3194 @N=220  [frame] (ref 18.3195, ratio 1.0000)  mesolve 18.3194 (+4.8e-10)  1s
+   f=  464.2 Hz kappa=  0.0021  F=  18.3195 @N=220  [frame] (ref 18.3195, ratio 1.0000)  mesolve 18.3195 (+7.7e-11)  1s
+   f=  562.3 Hz kappa=  0.0012  F=  18.3195 @N=220  [frame] (ref 18.3195, ratio 1.0000)  mesolve 18.3195 (+1.3e-10)  1s
+   f=  681.3 Hz kappa=  0.0006  F=  18.3195 @N=220  [frame] (ref 18.3195, ratio 1.0000)  mesolve 18.3195 (+1.2e-10)  1s
+   f=  825.4 Hz kappa=  0.0003  F=  18.3195 @N=220  [frame] (ref 18.3195, ratio 1.0000)  mesolve 18.3195 (-1.2e-10)  1s
+   f= 1000.0 Hz kappa=  0.0002  F=  18.3195 @N=220  [frame] (ref 18.3195, ratio 1.0000)  mesolve 18.3195 (-2.4e-10)  1s
+[eta_in=0.95 eta_ch=1.0 eta_out=0.95 pn_in=0.0] [opt_fock_sup] <n>=5.0000  kappa->0: beta relation 22.9980 vs direct 22.9980 (rel -5.3e-09) (eta_out × beta relation (paper Eq. 16) on the package's input-loss value at eta_in·eta_ch·eta_out) loss_in state at eta=0.95 used
+   f=   10.0 Hz kappa=  9.5299  F=   0.6967 @N=220  [frame] (ref 22.9980, ratio 0.0303)  36s
+   f=   12.1 Hz kappa=  6.4911  F=   1.3465 @N=220  [frame] (ref 22.9980, ratio 0.0585)  13s
+   f=   14.7 Hz kappa=  4.4209  F=   2.4829 @N=220  [frame] (ref 22.9980, ratio 0.1080)  4s
+   f=   17.8 Hz kappa=  3.0104  F=   4.4999 @N=220  [frame] (ref 22.9980, ratio 0.1957)  2s
+   f=   21.5 Hz kappa=  2.0495  F=   8.0076 @N=220  [frame] (ref 22.9980, ratio 0.3482)  mesolve 8.0078 (+1.6e-05)  6s
+   f=   26.1 Hz kappa=  1.3948  F=  12.7028 @N=220  [frame] (ref 22.9980, ratio 0.5523)  mesolve 12.7028 (-5.1e-09)  3s
+   f=   31.6 Hz kappa=  0.9488  F=  16.9816 @N=220  [frame] (ref 22.9980, ratio 0.7384)  mesolve 16.9816 (+3.5e-08)  1s
+   f=   38.3 Hz kappa=  0.6449  F=  19.8496 @N=220  [frame] (ref 22.9980, ratio 0.8631)  mesolve 19.8496 (-2.7e-09)  1s
+   f=   46.4 Hz kappa=  0.4379  F=  21.4500 @N=220  [frame] (ref 22.9980, ratio 0.9327)  mesolve 21.4500 (-3.1e-09)  1s
+   f=   56.2 Hz kappa=  0.2969  F=  22.2620 @N=220  [frame] (ref 22.9980, ratio 0.9680)  mesolve 22.2620 (-2.3e-09)  1s
+   f=   68.1 Hz kappa=  0.2008  F=  22.6548 @N=220  [frame] (ref 22.9980, ratio 0.9851)  mesolve 22.6548 (-1.4e-09)  1s
+   f=   82.5 Hz kappa=  0.1354  F=  22.8403 @N=220  [frame] (ref 22.9980, ratio 0.9931)  mesolve 22.8403 (+4.0e-10)  1s
+   f=  100.0 Hz kappa=  0.0909  F=  22.9264 @N=220  [frame] (ref 22.9980, ratio 0.9969)  mesolve 22.9264 (+1.7e-09)  1s
+   f=  121.2 Hz kappa=  0.0606  F=  22.9660 @N=220  [frame] (ref 22.9980, ratio 0.9986)  mesolve 22.9660 (+3.0e-09)  1s
+   f=  146.8 Hz kappa=  0.0400  F=  22.9840 @N=220  [frame] (ref 22.9980, ratio 0.9994)  mesolve 22.9840 (+2.7e-09)  1s
+   f=  177.8 Hz kappa=  0.0261  F=  22.9920 @N=220  [frame] (ref 22.9980, ratio 0.9997)  mesolve 22.9920 (+5.7e-09)  1s
+   f=  215.4 Hz kappa=  0.0167  F=  22.9955 @N=220  [frame] (ref 22.9980, ratio 0.9999)  mesolve 22.9955 (+4.3e-09)  1s
+   f=  261.0 Hz kappa=  0.0105  F=  22.9970 @N=220  [frame] (ref 22.9980, ratio 1.0000)  mesolve 22.9970 (+4.7e-09)  1s
+   f=  316.2 Hz kappa=  0.0064  F=  22.9976 @N=220  [frame] (ref 22.9980, ratio 1.0000)  mesolve 22.9976 (+1.7e-09)  1s
+   f=  383.1 Hz kappa=  0.0038  F=  22.9979 @N=220  [frame] (ref 22.9980, ratio 1.0000)  mesolve 22.9979 (+5.9e-10)  1s
+   f=  464.2 Hz kappa=  0.0021  F=  22.9980 @N=220  [frame] (ref 22.9980, ratio 1.0000)  mesolve 22.9980 (+1.5e-09)  1s
+   f=  562.3 Hz kappa=  0.0012  F=  22.9980 @N=220  [frame] (ref 22.9980, ratio 1.0000)  mesolve 22.9980 (+2.8e-10)  1s
+   f=  681.3 Hz kappa=  0.0006  F=  22.9980 @N=220  [frame] (ref 22.9980, ratio 1.0000)  mesolve 22.9980 (+1.7e-09)  1s
+   f=  825.4 Hz kappa=  0.0003  F=  22.9980 @N=220  [frame] (ref 22.9980, ratio 1.0000)  mesolve 22.9980 (+1.8e-09)  1s
+   f= 1000.0 Hz kappa=  0.0002  F=  22.9980 @N=220  [frame] (ref 22.9980, ratio 1.0000)  mesolve 22.9980 (+1.2e-09)  1s
+[eta_in=0.95 eta_ch=1.0 eta_out=0.95 pn_in=0.0] [opt_sqz_vac] <n>=4.9909  kappa->0: beta relation 27.2984 vs direct 27.2984 (rel +1.8e-10) (eta_out × beta relation (paper Eq. 16) on the package's input-loss value at eta_in·eta_ch·eta_out) loss_in state at eta=0.95 used
+   f=   10.0 Hz kappa=  9.5299  F=   0.8129 @N=220  [frame] (ref 27.2984, ratio 0.0298)  71s
+   f=   12.1 Hz kappa=  6.4911  F=   1.6924 @N=220  [frame] (ref 27.2984, ratio 0.0620)  33s
+   f=   14.7 Hz kappa=  4.4209  F=   3.4010 @N=220  [frame] (ref 27.2984, ratio 0.1246)  13s
+   f=   17.8 Hz kappa=  3.0104  F=   6.4023 @N=220  [frame] (ref 27.2984, ratio 0.2345)  6s
+   f=   21.5 Hz kappa=  2.0495  F=  10.8498 @N=220  [frame] (ref 27.2984, ratio 0.3975)  14s
+   f=   26.1 Hz kappa=  1.3948  F=  16.0202 @N=220  [frame] (ref 27.2984, ratio 0.5869)  10s
+   f=   31.6 Hz kappa=  0.9488  F=  20.5748 @N=220  [frame] (ref 27.2984, ratio 0.7537)  mesolve 20.5703 (-2.2e-04)  7s
+   f=   38.3 Hz kappa=  0.6449  F=  23.7040 @N=220  [frame] (ref 27.2984, ratio 0.8683)  mesolve 23.7018 (-9.3e-05)  4s
+   f=   46.4 Hz kappa=  0.4379  F=  25.5045 @N=220  [frame] (ref 27.2984, ratio 0.9343)  mesolve 25.5006 (-1.5e-04)  3s
+   f=   56.2 Hz kappa=  0.2969  F=  26.4362 @N=220  [frame] (ref 27.2984, ratio 0.9684)  mesolve 26.4322 (-1.5e-04)  2s
+   f=   68.1 Hz kappa=  0.2008  F=  26.8919 @N=220  [frame] (ref 27.2984, ratio 0.9851)  mesolve 26.8879 (-1.5e-04)  2s
+   f=   82.5 Hz kappa=  0.1354  F=  27.1085 @N=220  [frame] (ref 27.2984, ratio 0.9930)  mesolve 27.1045 (-1.5e-04)  2s
+   f=  100.0 Hz kappa=  0.0909  F=  27.2101 @N=220  [frame] (ref 27.2984, ratio 0.9968)  mesolve 27.2062 (-1.5e-04)  2s
+   f=  121.2 Hz kappa=  0.0606  F=  27.2575 @N=220  [frame] (ref 27.2984, ratio 0.9985)  mesolve 27.2535 (-1.4e-04)  2s
+   f=  146.8 Hz kappa=  0.0400  F=  27.2794 @N=220  [frame] (ref 27.2984, ratio 0.9993)  mesolve 27.2755 (-1.4e-04)  2s
+   f=  177.8 Hz kappa=  0.0261  F=  27.2896 @N=220  [frame] (ref 27.2984, ratio 0.9997)  mesolve 27.2857 (-1.4e-04)  2s
+   f=  215.4 Hz kappa=  0.0167  F=  27.2943 @N=220  [frame] (ref 27.2984, ratio 0.9998)  mesolve 27.2904 (-1.4e-04)  2s
+   f=  261.0 Hz kappa=  0.0105  F=  27.2965 @N=220  [frame] (ref 27.2984, ratio 0.9999)  mesolve 27.2926 (-1.4e-04)  2s
+   f=  316.2 Hz kappa=  0.0064  F=  27.2975 @N=220  [frame] (ref 27.2984, ratio 1.0000)  mesolve 27.2936 (-1.4e-04)  2s
+   f=  383.1 Hz kappa=  0.0038  F=  27.2979 @N=220  [frame] (ref 27.2984, ratio 1.0000)  mesolve 27.2941 (-1.4e-04)  2s
+   f=  464.2 Hz kappa=  0.0021  F=  27.2982 @N=220  [frame] (ref 27.2984, ratio 1.0000)  mesolve 27.2943 (-1.4e-04)  2s
+   f=  562.3 Hz kappa=  0.0012  F=  27.2983 @N=220  [frame] (ref 27.2984, ratio 1.0000)  mesolve 27.2944 (-1.4e-04)  2s
+   f=  681.3 Hz kappa=  0.0006  F=  27.2983 @N=220  [frame] (ref 27.2984, ratio 1.0000)  mesolve 27.2944 (-1.4e-04)  2s
+   f=  825.4 Hz kappa=  0.0003  F=  27.2984 @N=220  [frame] (ref 27.2984, ratio 1.0000)  mesolve 27.2945 (-1.4e-04)  2s
+   f= 1000.0 Hz kappa=  0.0002  F=  27.2984 @N=220  [frame] (ref 27.2984, ratio 1.0000)  mesolve 27.2945 (-1.4e-04)  2s
+[eta_in=0.95 eta_ch=1.0 eta_out=0.95 pn_in=0.0] [opt_sqz_coh] <n>=5.1447  kappa->0: beta relation 27.6049 vs direct 27.6049 (rel -4.0e-11) (eta_out × beta relation (paper Eq. 16) on the package's input-loss value at eta_in·eta_ch·eta_out) loss_in state at eta=0.95 used
+   f=   10.0 Hz kappa=  9.5299  F=   0.8137 @N=220  [frame] (ref 27.6049, ratio 0.0295)  78s
+   f=   12.1 Hz kappa=  6.4911  F=   1.6957 @N=220  [frame] (ref 27.6049, ratio 0.0614)  35s
+   f=   14.7 Hz kappa=  4.4209  F=   3.4125 @N=220  [frame] (ref 27.6049, ratio 0.1236)  15s
+   f=   17.8 Hz kappa=  3.0104  F=   6.4379 @N=220  [frame] (ref 27.6049, ratio 0.2332)  11s
+   f=   21.5 Hz kappa=  2.0495  F=  10.9360 @N=220  [frame] (ref 27.6049, ratio 0.3962)  18s
+   f=   26.1 Hz kappa=  1.3948  F=  16.1786 @N=220  [frame] (ref 27.6049, ratio 0.5861)  14s
+   f=   31.6 Hz kappa=  0.9488  F=  20.8022 @N=220  [frame] (ref 27.6049, ratio 0.7536)  mesolve 20.7710 (-1.5e-03)  9s
+   f=   38.3 Hz kappa=  0.6449  F=  23.9782 @N=220  [frame] (ref 27.6049, ratio 0.8686)  mesolve 23.9745 (-1.5e-04)  7s
+   f=   46.4 Hz kappa=  0.4379  F=  25.8028 @N=220  [frame] (ref 27.6049, ratio 0.9347)  mesolve 25.8022 (-2.6e-05)  4s
+   f=   56.2 Hz kappa=  0.2969  F=  26.7445 @N=220  [frame] (ref 27.6049, ratio 0.9688)  mesolve 26.7445 (+1.2e-06)  4s
+   f=   68.1 Hz kappa=  0.2008  F=  27.2031 @N=220  [frame] (ref 27.6049, ratio 0.9854)  mesolve 27.2033 (+5.4e-06)  3s
+   f=   82.5 Hz kappa=  0.1354  F=  27.4199 @N=220  [frame] (ref 27.6049, ratio 0.9933)  mesolve 27.4202 (+9.1e-06)  4s
+   f=  100.0 Hz kappa=  0.0909  F=  27.5207 @N=220  [frame] (ref 27.6049, ratio 0.9969)  mesolve 27.5210 (+1.1e-05)  3s
+   f=  121.2 Hz kappa=  0.0606  F=  27.5670 @N=220  [frame] (ref 27.6049, ratio 0.9986)  mesolve 27.5673 (+1.1e-05)  4s
+   f=  146.8 Hz kappa=  0.0400  F=  27.5881 @N=220  [frame] (ref 27.6049, ratio 0.9994)  mesolve 27.5884 (+1.2e-05)  4s
+   f=  177.8 Hz kappa=  0.0261  F=  27.5975 @N=220  [frame] (ref 27.6049, ratio 0.9997)  mesolve 27.5979 (+1.2e-05)  3s
+   f=  215.4 Hz kappa=  0.0167  F=  27.6017 @N=220  [frame] (ref 27.6049, ratio 0.9999)  mesolve 27.6021 (+1.2e-05)  3s
+   f=  261.0 Hz kappa=  0.0105  F=  27.6036 @N=220  [frame] (ref 27.6049, ratio 1.0000)  mesolve 27.6039 (+1.2e-05)  3s
+   f=  316.2 Hz kappa=  0.0064  F=  27.6043 @N=220  [frame] (ref 27.6049, ratio 1.0000)  mesolve 27.6047 (+1.2e-05)  3s
+   f=  383.1 Hz kappa=  0.0038  F=  27.6047 @N=220  [frame] (ref 27.6049, ratio 1.0000)  mesolve 27.6050 (+1.2e-05)  4s
+   f=  464.2 Hz kappa=  0.0021  F=  27.6048 @N=220  [frame] (ref 27.6049, ratio 1.0000)  mesolve 27.6051 (+1.2e-05)  4s
+   f=  562.3 Hz kappa=  0.0012  F=  27.6048 @N=220  [frame] (ref 27.6049, ratio 1.0000)  mesolve 27.6052 (+1.2e-05)  3s
+   f=  681.3 Hz kappa=  0.0006  F=  27.6049 @N=220  [frame] (ref 27.6049, ratio 1.0000)  mesolve 27.6052 (+1.2e-05)  4s
+   f=  825.4 Hz kappa=  0.0003  F=  27.6049 @N=220  [frame] (ref 27.6049, ratio 1.0000)  mesolve 27.6052 (+1.2e-05)  4s
+   f= 1000.0 Hz kappa=  0.0002  F=  27.6049 @N=220  [frame] (ref 27.6049, ratio 1.0000)  mesolve 27.6052 (+1.2e-05)  3s
+summary: /home/user/ligo-backaction-qfi/results/combined_loss_in0p95_out0p95/summary.md
+figure: /home/user/ligo-backaction-qfi/figures/combined_loss_in0p95_out0p95.png
