@@ -15,7 +15,7 @@ package.
 | `requirements.txt` | the pip side of the same setup; installs the package above in editable mode |
 | `data/optimised_states/` | the group's previously optimised probes (no back-action), with the orientation note in its README |
 | `scripts/export_for_upstream.py` | assembles `for_upstream/`, this study laid out for the group's repository (see *Uploading to the group's repository*) |
-| `studies/` | the sweeps. `backaction_only.py`: QFI vs frequency with back-action only. `input_loss.py`: input loss (transmission 0.95) + back-action, checked against the paper's numbers. `channel_loss.py`: loss concurrent with the shear, the first frequency-dependent case; `--pn-in 0.2` adds the paper's 200 mrad preparation phase noise |
+| `studies/` | the sweeps. `backaction_only.py`: QFI vs frequency with back-action only. `input_loss.py`: input loss (transmission 0.95) + back-action, checked against the paper's numbers. `channel_loss.py`: loss concurrent with the shear, the first frequency-dependent case; `--pn-in 0.2` adds the paper's 200 mrad preparation phase noise. `output_loss.py`: loss after the shear, the placement behind frequency-dependent squeezing |
 | `results/`, `figures/` | outputs of the studies, one folder per study, with a `summary.md` each |
 | `tests/` | smoke tests for the environment, the Fock-cutoff convergence suite, the Gaussian benchmark suite, and the optimised-state loader |
 
@@ -132,3 +132,12 @@ with the optimised states from that exact slice. At high frequency the paper's o
 reproduced (the three optimised families at 30.4-30.5 against squeezed vacuum at 18.2, the
 2.2 dB non-Gaussian advantage). Below ~30 Hz the ordering changes: the Fock state degrades
 least and is the best probe at 10 Hz. See `results/channel_loss_pn0p2/summary.md`.
+
+### Output loss + back-action (`studies/output_loss.py`)
+
+5 % loss *after* the sensing stage, on the sheared state. The steepest frequency dependence
+of the three placements: fixed-angle squeezed vacuum keeps 2 % of its QFI at 10 Hz, the Fock
+state 4 %. The Gaussian track gives the frequency-dependent-squeezing reference (squeezed
+vacuum at the optimal angle per frequency), which still beats every fixed probe at 10 Hz.
+The paper has no `loss_out` optimisation for the squeezed-coherent family, so that probe
+uses its channel-loss state (marked). See `results/output_loss/summary.md`.
