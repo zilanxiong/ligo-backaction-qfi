@@ -1,0 +1,24 @@
+| channel loss + phase noise, 30 Hz | squeezed | 14.96237473 | 14.96237707 | 14.96237709 | 14.96237709 | -1.9e-09 | 3 s / 16 s |
+| channel loss + phase noise, 30 Hz | opt_fock_sup | 25.38919874 | 25.38920294 | 25.38920298 | 25.38920301 | -3.1e-09 | 2 s / 1 s |
+| channel loss + phase noise, 10 Hz | fock | 2.55694500 | 2.55694501 | 2.55694501 | 2.55694501 | -8.8e-11 | 4 s / 3 s |
+| three losses, 10 Hz | squeezed | 0.60197987 | 0.60197987 | 0.60197987 | 0.60197987 | -3.9e-11 | 59 s / 34 s |
+| three losses, 30 Hz | cat | 4.97975646 | 4.97975675 | 4.97975675 | 4.97975674 | +3.1e-10 | 2 s / 1 s |
+  ladder squeezed N=160: 1.79908522 (9s)
+  ladder squeezed N=220: 1.79908524 (29s)
+  ladder squeezed N=300: 1.79908524 (80s)
+  ladder squeezed N=400: 1.79908524 (139s)
+  ladder squeezed N=560: 1.79908524 (453s)
+  ladder fock N=160: 2.55694501 (1s)
+  ladder fock N=220: 2.55694501 (3s)
+  ladder fock N=300: 2.55694501 (5s)
+  ladder fock N=400: 2.55694501 (9s)
+  ladder fock N=560: 2.55694501 (23s)
+  ladder opt_fock_sup N=160: 1.66232586 (2s)
+  ladder opt_fock_sup N=220: 1.66232586 (3s)
+  ladder opt_fock_sup N=300: 1.66232586 (6s)
+  ladder opt_fock_sup N=400: 1.66232586 (11s)
+  ladder opt_fock_sup N=560: 1.66232586 (25s)
+| channel loss + phase noise, 30 Hz | squeezed | 14.96235555 | 14.96237709 | 14.96237733 | +1.6e-08 |
+| channel loss + phase noise, 30 Hz | opt_fock_sup | 25.38917624 | 25.38920301 | 25.38920339 | +1.5e-08 |
+| channel loss + phase noise, 10 Hz | fock | 2.55692890 | 2.55694501 | 2.55694515 | +5.5e-08 |
+summary: /home/user/ligo-backaction-qfi/results/numerics/summary.md

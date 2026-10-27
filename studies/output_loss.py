@@ -119,7 +119,7 @@ def sweep(etas, n_max, quick, checkpoint=None):
                     if len(rungs) < 2:
                         rungs = [rungs[0], n_max] if rungs[0] < n_max else [int(0.75 * n_max), n_max]
                     chk = b.converge(lambda N: b.rp_qfi(probe(fam, N, eta), kappa_ba=k, eta_out=eta, pn_in=PN_IN, N_basis=N),
-                                     cutoffs=rungs, rtol=1e-3)
+                                     cutoffs=rungs, rtol=1e-3, n_stable=2)
                     mes = chk.value if chk.converged else np.nan
                 rows.append(dict(eta_out=eta, pn_in=PN_IN, family=fam, freq_hz=f, kappa_ba=k, nbar=nbar, qfi_fock=res.value,
                                  cutoff=res.cutoff, converged=res.converged, track=track, qfi_reference=ref,

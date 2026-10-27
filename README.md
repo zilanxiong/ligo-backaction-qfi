@@ -9,7 +9,7 @@ package.
 | path | what it is |
 |---|---|
 | `quantum_sensing/` | the group's single-mode sensing package, vendored unmodified from `shruti-jm/quantum-sensing` (`python/quantum_sensing/`). Not edited here |
-| `backaction_qfi/` | the study layer, built *on top of* the package without editing it: `solver` (tight ODE tolerances injected from outside, `rp_channel`, `rp_qfi`, pure-state track), `branches` (input noise then the lossless unitary, exact at large cutoffs), `frame` (the channel in the frame moving with the shear: exact at any κ with ~200 levels), `probes` (coherent, squeezed, cat, Fock at a given cutoff), `convergence` (Fock-cutoff ladder, truncation alarm), `gaussian` (covariance-matrix track: exact for Gaussian probes, SQL / variational / FD-squeezing curves, strain conversion), `optimised` (loads the group's optimised probes, rotated onto the GW signal) |
+| `backaction_qfi/` | the study layer, built *on top of* the package without editing it: `solver` (tight ODE tolerances injected from outside, `rp_channel`, `rp_qfi`, pure-state track), `branches` (input noise then the lossless unitary, exact at large cutoffs), `frame` (the channel in the frame moving with the shear: exact at any κ with ~200 levels; `rp_qfi_unsheared_exact` takes the derivative exactly via the sensitivity equation, no finite-difference step), `probes` (coherent, squeezed, cat, Fock at a given cutoff), `convergence` (Fock-cutoff ladder, truncation alarm), `gaussian` (covariance-matrix track: exact for Gaussian probes, SQL / variational / FD-squeezing curves, strain conversion), `optimised` (loads the group's optimised probes, rotated onto the GW signal) |
 | `pyproject.toml` | packaging for both, so `pip install -e .` installs them |
 | `environment.yml` | conda environment that reproduces this project's setup |
 | `requirements.txt` | the pip side of the same setup; installs the package above in editable mode |
@@ -152,3 +152,10 @@ every loss commutes with the displacement up to a rescaling, so at κ → 0 the 
 η_out·β(η_ch)² × the input-loss value at the product transmission η_in·η_ch·η_out (paper
 supplement Eq. 16 and 17). The package channel reproduces this to 1e-7 for all eight probes,
 Gaussian and non-Gaussian alike.
+
+### Numerical checks (`studies/numerics_checks.py`)
+
+On real sweep points: the finite-difference step (1e-4, 1e-5, 1e-6) sits on a plateau to
+1e-9; the exact derivative (sensitivity equation) agrees with it to 1e-9; the cutoff
+ladder extended to 560 levels at the hardest points moves nothing beyond 1e-9; the
+eigenvalue cutoff in the QFI sum matters at 1e-8 relative. See `results/numerics/summary.md`.

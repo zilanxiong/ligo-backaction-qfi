@@ -202,3 +202,24 @@ def test_unsheared_frame_matches_gaussian_track_at_large_shear(kw):
     import backaction_qfi.gaussian as g
     got = b.rp_qfi_unsheared(b.squeezed(220, 5.0), **kw)
     assert got == pytest.approx(g.gaussian_qfi(g.squeezed_at_fixed_nbar(5.0), **kw), rel=1e-5)
+
+
+# --- exact derivative (sensitivity equation) -------------------------------------------
+
+@pytest.mark.parametrize("kw", [dict(kappa_ba=1.5, eta_ch=0.95), dict(kappa_ba=2.0, eta_in=0.9, eta_ch=0.9),
+                                dict(kappa_ba=1.0, eta_in=0.95, eta_ch=0.95, eta_out=0.95, pn_in=0.2)])
+def test_exact_derivative_matches_finite_difference(kw):
+    psi = b.cat_even(100, 2.0)
+    assert b.rp_qfi_unsheared_exact(psi, **kw) == pytest.approx(b.rp_qfi_unsheared(psi, **kw), rel=1e-7)
+
+
+def test_exact_derivative_matches_gaussian_track_at_large_shear():
+    import backaction_qfi.gaussian as g
+    kw = dict(kappa_ba=9.53, eta_ch=0.95, eta_out=0.95)
+    got = b.rp_qfi_unsheared_exact(b.squeezed(220, 5.0), **kw)
+    assert got == pytest.approx(g.gaussian_qfi(g.squeezed_at_fixed_nbar(5.0), **kw), rel=1e-5)
+
+
+def test_exact_derivative_reduces_to_eight_var_x_without_noise():
+    psi = b.cat_even(80, 2.0)
+    assert b.rp_qfi_unsheared_exact(psi, kappa_ba=2.0) == pytest.approx(8 * b.var_x(psi), rel=1e-8)
