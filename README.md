@@ -149,8 +149,8 @@ output 0.95 (`results/combined_loss_out0p95/`) input 0.95 + output 0.95
 (`results/combined_loss_in0p95_out0p95/`), all three at 0.95
 (`results/combined_loss_in0p95_ch0p95_out0p95/`), and the physical stack with phase noise
 (`results/combined_loss_in0p95_ch0p99_out0p9_pn0p2/`: input 0.95, channel 0.99, output 0.90,
-200 mrad; optimised states from the paper's slice matched to the *total* transmission, 0.85,
-with the channel-loss-matched 0.99 slice kept on file for comparison). The paper has no multi-placement results, but
+200 mrad, and `..._pn0p05/` at 50 mrad; optimised states from the paper's slice matched to the
+*total* transmission, 0.85, with the channel-loss-matched 0.99 slice kept on file for comparison). The paper has no multi-placement results, but
 every loss commutes with the displacement up to a rescaling, so at κ → 0 the QFI must equal
 η_out·β(η_ch)² × the input-loss value at the product transmission η_in·η_ch·η_out (paper
 supplement Eq. 16 and 17). The package channel reproduces this to 1e-7 for all eight probes,
