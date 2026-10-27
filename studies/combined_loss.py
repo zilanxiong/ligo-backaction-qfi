@@ -210,9 +210,11 @@ def figure(df, eta, path):
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel(r"Frequency  $\Omega/2\pi$  [Hz]"); ax.set_ylabel(r"QFI for $\varepsilon_a$")
     pn = d_eta.pn_in.iloc[0] if "pn_in" in d_eta else 0.0
-    head = f"phase noise ({1000 * pn:.0f} mrad) → " if pn > 0 else ""
     ein, eout = d_eta.eta_in.iloc[0], d_eta.eta_out.iloc[0]
-    title = head + (f"input loss ($\\eta_{{in}}$ = {ein:g}) → " if ein < 1 else "")
+    # phase noise and input loss act in the same (input) stage: join with "+", not "→"
+    stage1 = [s for s, on in ((f"phase noise ({1000 * pn:.0f} mrad)", pn > 0),
+                              (f"input loss ($\\eta_{{in}}$ = {ein:g})", ein < 1)) if on]
+    title = " + ".join(stage1) + (" → " if stage1 else "")
     title += "backaction + displacement" + (f" + channel loss ($\\eta_{{ch}}$ = {eta:g})" if eta < 1 else "")
     title += (f" → output loss ($\\eta_{{out}}$ = {eout:g})" if eout < 1 else "") + ", ⟨n⟩ = 5"
     if len(title) > 110:                      # two lines: noise stages / sensing stage onward
