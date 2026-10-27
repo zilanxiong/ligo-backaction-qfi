@@ -41,6 +41,7 @@ ETAS = [0.95]
 PN_IN = 0.0            # set from --pn-in
 ETA_IN = 0.95          # set from --eta-in (1.0 = off)
 ETA_OUT = 1.0          # set from --eta-out (1.0 = off)
+OPT_SLICE_ETA = None   # --opt-slice-eta: override the loss_ch slice the optimised states come from
 FREQS_HZ = np.logspace(1, 3, 25)
 N_REF = 400
 FRAME_LADDER = [120, 160, 220, 300, 400]
@@ -64,6 +65,8 @@ def _available_etas(state_type, config):
 
 def _slice_for(eta):
     """Which of the paper's loss slices to draw the optimised states from."""
+    if OPT_SLICE_ETA is not None:
+        return "loss_ch", OPT_SLICE_ETA
     if eta < 1.0:
         return "loss_ch", eta
     if ETA_IN < 1.0:
@@ -79,6 +82,8 @@ def opt_slice(family, eta):
     if not avail and config == "loss_out":          # sqz_coh has no loss_out optimisations
         config, avail = "loss_ch", _available_etas(family[4:], "loss_ch")
     if e_want in avail:
+        if OPT_SLICE_ETA is not None:
+            return e_want, f"{config} state at eta={e_want} used (slice matched to total transmission)"
         return e_want, ("" if config == "loss_ch" and eta < 1.0 else f"{config} state at eta={e_want} used")
     near = min(avail, key=lambda e: abs(e - e_want))
     return near, f"no {config} entry at eta={e_want}, pn={PN_IN}; nearest {config} slice eta={near} used"
@@ -123,13 +128,13 @@ def direct_kappa0(family, eta):
     return b.rp_qfi(probe(family, 200, eta), kappa_ba=0.0, eta_in=ETA_IN, eta_ch=eta, eta_out=ETA_OUT, pn_in=PN_IN)
 
 
-def sweep(etas, n_max, quick, checkpoint=None):
+def sweep(etas, n_max, quick, checkpoint=None, families=None):
     freqs = FREQS_HZ[::4] if quick else FREQS_HZ
     kappas = rp_kappa(2 * np.pi * freqs)
     ladder = [N for N in default_ladder(40, n_max) if N <= n_max]
     rows = []
     for eta in etas:
-        for fam in FAMILIES:
+        for fam in (families or FAMILIES):
             ref, ref_src = reference(fam, eta)
             k0 = direct_kappa0(fam, eta)
             e_used, e_note = opt_slice(fam, eta) if fam.startswith("opt_") else (np.nan, "")
@@ -210,7 +215,9 @@ def figure(df, eta, path):
     title = head + (f"input loss ($\\eta_{{in}}$ = {ein:g}) → " if ein < 1 else "")
     title += "backaction + displacement" + (f" + channel loss ($\\eta_{{ch}}$ = {eta:g})" if eta < 1 else "")
     title += (f" → output loss ($\\eta_{{out}}$ = {eout:g})" if eout < 1 else "") + ", ⟨n⟩ = 5"
-    ax.set_title(title, fontsize=10 if len(title) < 95 else 8.6)
+    if len(title) > 110:                      # two lines: noise stages / sensing stage onward
+        title = title.replace(" → backaction", "\n→ backaction", 1)
+    ax.set_title(title, fontsize=10 if len(title) < 95 else 9)
     ax.grid(True, which="both", alpha=0.3)
     _kappa_axis(ax)
     ax.legend(loc="lower right", fontsize=8)
@@ -259,9 +266,11 @@ def main():
     ap.add_argument("--pn-in", type=float, default=0.0, help="input phase noise rms [rad]")
     ap.add_argument("--eta-in", type=float, default=0.95, help="input-loss transmission (1 = off)")
     ap.add_argument("--eta-out", type=float, default=1.0, help="output-loss transmission (1 = off)")
+    ap.add_argument("--opt-slice-eta", type=float, default=None, help="take the optimised states from the loss_ch slice at this eta")
+    ap.add_argument("--families", nargs="*", default=None, help="run only these probes; their rows replace the saved ones")
     args = ap.parse_args()
-    global PN_IN, OUT, ETA_IN, ETA_OUT
-    PN_IN, ETA_IN, ETA_OUT = args.pn_in, args.eta_in, args.eta_out
+    global PN_IN, OUT, ETA_IN, ETA_OUT, OPT_SLICE_ETA
+    PN_IN, ETA_IN, ETA_OUT, OPT_SLICE_ETA = args.pn_in, args.eta_in, args.eta_out, args.opt_slice_eta
     ch = args.etas[0] if len(args.etas) == 1 else None
     tag = ((f"_in{ETA_IN:g}" if ETA_IN < 1 else "") + (f"_ch{ch:g}" if (ch is not None and ch < 1) else "")
            + (f"_out{ETA_OUT:g}" if ETA_OUT < 1 else "") + (f"_pn{PN_IN:g}" if PN_IN > 0 else "")).replace(".", "p")
@@ -271,7 +280,10 @@ def main():
     if args.figure_only:
         df = pd.read_csv(csv); df["note"] = df["note"].fillna("")
     else:
-        df = sweep(args.etas, args.n_max, args.quick, checkpoint=OUT / "checkpoint.csv")
+        df = sweep(args.etas, args.n_max, args.quick, checkpoint=OUT / "checkpoint.csv", families=args.families)
+        if args.families and csv.exists():      # replace only the rerun probes
+            old = pd.read_csv(csv); old["note"] = old["note"].fillna("")
+            df = pd.concat([old[~old.family.isin(args.families)], df], ignore_index=True)
         df.to_csv(csv, index=False)
         (OUT / "checkpoint.csv").unlink(missing_ok=True)
     write_summary(df, OUT / "summary.md")
