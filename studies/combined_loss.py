@@ -210,7 +210,7 @@ def figure(df, eta, path):
     title = head + (f"input loss ($\\eta_{{in}}$ = {ein:g}) → " if ein < 1 else "")
     title += "backaction + displacement" + (f" + channel loss ($\\eta_{{ch}}$ = {eta:g})" if eta < 1 else "")
     title += (f" → output loss ($\\eta_{{out}}$ = {eout:g})" if eout < 1 else "") + ", ⟨n⟩ = 5"
-    ax.set_title(title, fontsize=10)
+    ax.set_title(title, fontsize=10 if len(title) < 95 else 8.6)
     ax.grid(True, which="both", alpha=0.3)
     _kappa_axis(ax)
     ax.legend(loc="lower right", fontsize=8)
@@ -262,8 +262,9 @@ def main():
     args = ap.parse_args()
     global PN_IN, OUT, ETA_IN, ETA_OUT
     PN_IN, ETA_IN, ETA_OUT = args.pn_in, args.eta_in, args.eta_out
-    tag = ((f"_in{ETA_IN:g}" if ETA_IN < 1 else "") + (f"_out{ETA_OUT:g}" if ETA_OUT < 1 else "")
-           + (f"_pn{PN_IN:g}" if PN_IN > 0 else "")).replace(".", "p")
+    ch = args.etas[0] if len(args.etas) == 1 else None
+    tag = ((f"_in{ETA_IN:g}" if ETA_IN < 1 else "") + (f"_ch{ch:g}" if (ch is not None and ch < 1) else "")
+           + (f"_out{ETA_OUT:g}" if ETA_OUT < 1 else "") + (f"_pn{PN_IN:g}" if PN_IN > 0 else "")).replace(".", "p")
     OUT = ROOT / "results" / ("combined_loss" + tag)
     OUT.mkdir(parents=True, exist_ok=True); FIG.mkdir(exist_ok=True)
     csv = OUT / "qfi_vs_frequency.csv"
@@ -275,7 +276,7 @@ def main():
         (OUT / "checkpoint.csv").unlink(missing_ok=True)
     write_summary(df, OUT / "summary.md")
     for eta in sorted(df.eta_ch.unique()):
-        figure(df, eta, FIG / (("combined_loss" + (f"_ch{eta:g}" if eta < 1 else "")).replace(".", "p") + tag + ".png"))
+        figure(df, eta, FIG / ("combined_loss" + tag + ".png"))
 
 
 if __name__ == "__main__":
